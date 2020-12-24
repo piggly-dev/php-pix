@@ -328,7 +328,7 @@ class Payload
 	 * @return string
 	 */
 	protected function getMerchantCategoryCode ()
-	{ return '520400000'; }
+	{ return '52040000'; }
 
 	/**
 	 * Get the current transaction currency.

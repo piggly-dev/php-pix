@@ -19,7 +19,7 @@ De acordo com o [Manual do BR Code](https://www.bcb.gov.br/content/estabilidadef
 1. Geração do **QR Code** o método `getQRCode()`, utilizando a biblioteca `chillerlan/php-code` ([veja aqui](https://github.com/chillerlan/php-qrcode));
 2. O código Pix em formato de texto com o método `getPixCode()` para o formato de pagamento **Pix Copia & Cola**.
 
-### Padrão EMV®1
+### Padrão EMV®1 
 
 Por padrão, o **BR Code** utiliza apenas caracteres alfanuméricos, identificado pelo seguinte regex `[A-Za-z0-9\$\%\*\+\-\.\/\ ]`. A estrutura do código EMV®1 é composta por três conjuntos de caracteres:
 
