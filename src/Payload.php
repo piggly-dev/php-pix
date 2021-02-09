@@ -255,10 +255,10 @@ class Payload
 			'outputType' => $imageType
 		]);
 
-		if ( empty( $this->pixCode ) )
+		if ( empty( $this->pixCode ) ) 
 		{ $this->getPixCode(); }
 
-		return (new QRCode())->render($this->pixCode); 
+		return (new QRCode($options))->render($this->pixCode); 
 	}
 
 	/**

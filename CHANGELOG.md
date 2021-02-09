@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+* Correção de bugs.
+
 ## 1.0.2
 
 * Remoção dos limites de caracteres para Merchant Name e Merchant City.
