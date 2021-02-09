@@ -58,16 +58,16 @@ A classe `Parser` apresenta todos os métodos como `static` e segue o seguinte f
 A classe `Payload` é responsável por montar o payload do Pix e segute o seguinte formato:
 
 * Métodos com `set` determinam valores para os atributos do Pix;
-* O método `getPixCode()` retorna o código Pix em formato de texto;
-* O método `getQRCode` returna uma `string` no formato `data:image/png;base64`.
+* O método `getPixCode()` retorna o código Pix em formato de texto, agora pode ser enviado o `Payload::OUTPUT_SVG` ou `Payload::OUTPUT_PNG` para o formato de saída do QR Code;
+* O método `getQRCode` returna uma `string` no formato PNG `data:image/png;base64` e no formato SVG uma HTML tag.
 
 ### Os atributos do Pix
 
 Os atributos **obrigatórios** do Pix são:
 
 * `Pix Key` alterado pelo método `setPixKey()` com o tipo e o valor da chave Pix;
-* `Merchant Name` alterado pelo método `setMerchantName()` com o nome do titular da conta como conta no banco. Tamanho máximo de `25 caracteres`.
-* `Merchant City` alterado pelo método `setMerchantCity()` com a cidade do titular da conta como conta no banco. Tamanho máximo de `15 caracteres`.
+* `Merchant Name` alterado pelo método `setMerchantName()` com o nome do titular da conta como conta no banco. O tamanho máximo de caracteres foi retirado.
+* `Merchant City` alterado pelo método `setMerchantCity()` com a cidade do titular da conta como conta no banco. O tamanho máximo de caracteres foi retiado.
 
 Os atributos **opcionais** do Pix são:
 

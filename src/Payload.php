@@ -2,6 +2,7 @@
 namespace Piggly\Pix;
 
 use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Exception;
 use Piggly\Pix\Parser;
 
@@ -50,6 +51,11 @@ class Payload
 	const ID_ADDITIONAL_DATA_FIELD_TEMPLATE_TID = '05';
 	/** @var string CRC16 */
 	const ID_CRC16 = '63';
+
+	/** @var string OUTPUT_SVG Return QR Code in SVG. */
+	const OUTPUT_SVG = QRCode::OUTPUT_MARKUP_SVG;
+	/** @var string OUTPUT_PNG Return QR Code in PNG. */
+	const OUTPUT_PNG = QRCode::OUTPUT_IMAGE_PNG;
 	
 	/**
 	 * Pix key.
@@ -148,10 +154,11 @@ class Payload
 	 * 
 	 * @param string $merchantName Pix merchant name.
 	 * @since 1.0.0
+	 * @since 1.0.2 Removed character limit.
 	 * @return self
 	 */
 	public function setMerchantName ( string $merchantName )
-	{ $this->merchantName = $this->applyLength($merchantName, 25); return $this; }
+	{ $this->merchantName = $this->applyLength($merchantName); return $this; }
 
 	/**
 	 * Set the current pix merchant city.
@@ -161,10 +168,11 @@ class Payload
 	 * 
 	 * @param string $merchantCity Pix merchant city.
 	 * @since 1.0.0
+	 * @since 1.0.2 Removed character limit.
 	 * @return self
 	 */
 	public function setMerchantCity ( string $merchantCity )
-	{ $this->merchantCity = $this->applyLength($merchantCity, 15); return $this; }
+	{ $this->merchantCity = $this->applyLength($merchantCity); return $this; }
 
 	/**
 	 * Set the current pix transaction id.
@@ -234,12 +242,19 @@ class Payload
 	 * Return the qr code based in current pix code.
 	 * The qr code format is a base64 image/png.
 	 * 
+	 * @param string $imageType Type of output image.
 	 * @since 1.0.0
+	 * @since 1.0.2 Added support for output image.
 	 * @return string
 	 * @throws Exception When something went wrong.
 	 */
-	public function getQRCode () : string
+	public function getQRCode ( string $imageType = self::OUTPUT_SVG ) : string
 	{ 
+		$options = new QROptions([
+			'outputLevel' => QRCode::ECC_M,
+			'outputType' => $imageType
+		]);
+
 		if ( empty( $this->pixCode ) )
 		{ $this->getPixCode(); }
 
