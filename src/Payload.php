@@ -155,10 +155,11 @@ class Payload
 	 * @param string $merchantName Pix merchant name.
 	 * @since 1.0.0
 	 * @since 1.0.2 Removed character limit.
+	 * @since 1.0.3 Removed applyLength function.
 	 * @return self
 	 */
 	public function setMerchantName ( string $merchantName )
-	{ $this->merchantName = $this->applyLength($merchantName); return $this; }
+	{ $this->merchantName = $merchantName; return $this; }
 
 	/**
 	 * Set the current pix merchant city.
@@ -169,10 +170,11 @@ class Payload
 	 * @param string $merchantCity Pix merchant city.
 	 * @since 1.0.0
 	 * @since 1.0.2 Removed character limit.
+	 * @since 1.0.3 Removed applyLength function.
 	 * @return self
 	 */
 	public function setMerchantCity ( string $merchantCity )
-	{ $this->merchantCity = $this->applyLength($merchantCity); return $this; }
+	{ $this->merchantCity = $merchantCity; return $this; }
 
 	/**
 	 * Set the current pix transaction id.

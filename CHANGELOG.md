@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+* Correção de bugs.
+
 ## 1.0.3
 
 * Correção de bugs.

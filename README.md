@@ -78,7 +78,7 @@ Os atributos **opcionais** do Pix são:
 
 ## Como utilizar?
 
-Em [sample/pix.php](sample/pix.php) você encontra um exemplo de implementação. Esta biblioteca é bem simples de utilizar e tudo que você precisa fazer é solicitar ao usuário ou ter os seguintes dados para gerar o Pix:
+Em [samples/pix.php](samples/pix.php) você encontra um exemplo de implementação. Esta biblioteca é bem simples de utilizar e tudo que você precisa fazer é solicitar ao usuário ou ter os seguintes dados para gerar o Pix:
 
 Obrigatórios:
 
