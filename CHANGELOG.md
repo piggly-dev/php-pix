@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+* Essa é a primeira grande mudança da biblioteca. Lapidamos melhor alguns métodos da classe `Parser`, adicionamos modificadores na classe `Payload` e criamos a classe `Reader` para extrair dados de códigos Pix válidos.
+
 ## 1.0.4
 
 * Correção de bugs.

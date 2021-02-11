@@ -19,6 +19,9 @@ $reusable = false;
 // Create the pix payload
 $pix = 
 	(new Payload())
+		// ->applyValidCharacters()
+		// ->applyUppercase()
+		// ->applyEmailWhitespace()
 		->setPixKey($keyType, $keyValue)
 		->setMerchantName($merchantName)
 		->setMerchantCity($merchantCity)

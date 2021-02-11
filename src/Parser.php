@@ -59,19 +59,34 @@ class Parser
 	 */
 	public static function validate ( string $key, string $value )
 	{
+		if ( !in_array($key, [self::KEY_TYPE_RANDOM, self::KEY_TYPE_DOCUMENT, self::KEY_TYPE_EMAIL, self::KEY_TYPE_PHONE]) )
+		{ throw new Exception(sprintf('A chave `%s` é desconhecida.', $key)); }
+
+		$validate = false;
+		$alias    = 'Chave Desconhecida';
+
 		switch ( $key )
 		{
 			case self::KEY_TYPE_RANDOM:
-				return self::validateRandom($value);
+				$validate = self::validateRandom($value);
+				$alias    = self::getAlias($key);
+				break;
 			case self::KEY_TYPE_DOCUMENT:
-				return self::validateDocument($value);
+				$validate = self::validateDocument($value);
+				$alias    = self::getAlias($key);
+				break;
 			case self::KEY_TYPE_EMAIL:
-				return self::validateEmail($value);
+				$validate = self::validateEmail($value);
+				$alias    = self::getAlias($key);
+				break;
 			case self::KEY_TYPE_PHONE:
-				return self::validatePhone($value);
+				$validate = self::validatePhone($value);
+				$alias    = self::getAlias($key);
+				break;
 		}
 
-		throw new Exception(sprintf('A chave `%s` é desconhecida.', $key));
+		if ( !$validate )
+		{ throw new Exception(sprintf('O valor `%s` para %s está inválido.', $alias, $value)); }
 	}
 
 	/**
@@ -79,12 +94,14 @@ class Parser
 	 * 
 	 * @since 1.0.0
 	 * @param string $random Pix key value.
-	 * @throws Exception
+	 * @return bool
 	 */
-	public static function validateRandom ( string $random )
+	public static function validateRandom ( string $random ) : bool
 	{
-		if ( !preg_match('/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/', $random) )
-		{ throw new Exception(sprintf('A chave aleatória `%s` está inválida.', $random)); }
+		if ( !preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $random) )
+		{ return false; }
+
+		return true;
 	}
 
 	/**
@@ -92,18 +109,18 @@ class Parser
 	 * 
 	 * @since 1.0.0
 	 * @param string $document Pix key value.
-	 * @throws Exception
+	 * @return bool
 	 */
-	public static function validateDocument ( string $document )
+	public static function validateDocument ( string $document ) : bool
 	{
 		$parsed = self::parseDocument($document);
 		
 		if ( strlen($parsed) === 11 )
-		{ self::validateCpf($parsed); return; }
+		{ return self::validateCpf($parsed); }
 		else if ( strlen($parsed) === 14 )
-		{ self::validateCnpj($parsed); return; }
+		{ return self::validateCnpj($parsed); }
 
-		throw new Exception(sprintf('A chave de CPF/CNPJ `%s` está inválida.', $document));
+		return false;
 	}
 
 	/**
@@ -111,14 +128,13 @@ class Parser
 	 * 
 	 * @since 1.0.0
 	 * @param string $document String with only numbers.
-	 * @return void
-	 * @throws Exception When invalid.
+	 * @return bool
 	 */
-	protected static function validateCpf ( string $document )
+	protected static function validateCpf ( string $document ) : bool
 	{
-		// Prevent equal numbers
-		if (preg_match('/(\d)\1{10}/', $document)) 
-		{ throw new Exception(sprintf('A chave de CPF/CNPJ `%s` está inválida.', $document)); }
+		// Only numbers
+		if ( !preg_match('/^[\d]{11}$/', $document) ) 
+		{ return false; }
 	
 		// CPF Checksum
 		for ($t = 9; $t < 11; $t++) 
@@ -129,8 +145,10 @@ class Parser
 			$d = ((10 * $d) % 11) % 10;
 
 			if ( $document[$c] != $d ) 
-			{ throw new Exception(sprintf('A chave de CPF/CNPJ `%s` está inválida.', $document)); }
+			{ return false; }
 	  	}
+
+		return true;
 	}
 
 	/**
@@ -138,14 +156,13 @@ class Parser
 	 * 
 	 * @since 1.0.0
 	 * @param string $document String with only numbers.
-	 * @return void
-	 * @throws Exception When invalid.
+	 * @return bool
 	 */
-	protected static function validateCnpj ( string $document )
+	protected static function validateCnpj ( string $document ) : bool
 	{
-		// Prevent equal numbers
-		if (preg_match('/(\d)\1{13}/', $document)) 
-		{ throw new Exception(sprintf('A chave de CPF/CNPJ `%s` está inválida.', $document)); }
+		// Only numbers
+		if ( !preg_match('/^[\d]{14}$/', $document) ) 
+		{ return false; }
 	
 		// CNPJ first Checksum
 		for ( $i = 0, $j = 5, $sum = 0; $i < 12; $i++ )
@@ -157,7 +174,7 @@ class Parser
 		$result = $sum % 11;
 
 		if ( $document[12] !== (string)( $result < 2 ? 0 : 11 - $result ) )
-		{ throw new Exception(sprintf('A chave de CPF/CNPJ `%s` está inválida.', $document)); }
+		{ return false; }
 	
 		// CNPJ second Checksum
 		for ($i = 0, $j = 6, $sum = 0; $i < 13; $i++)
@@ -169,7 +186,9 @@ class Parser
 		$result = $sum % 11;
 
 		if ( $document[13] !== (string)( $result < 2 ? 0 : 11 - $result ) )
-		{ throw new Exception(sprintf('A chave de CPF/CNPJ `%s` está inválida.', $document)); }
+		{ return false; }
+
+		return true;
 	}
 
 	/**
@@ -177,12 +196,12 @@ class Parser
 	 * 
 	 * @since 1.0.0
 	 * @param string $email Pix key value.
-	 * @throws Exception
+	 * @return bool
 	 */
-	public static function validateEmail ( string $email )
+	public static function validateEmail ( string $email ) : bool
 	{
-		if ( !preg_match("/[^\@]+\@[^\.]+\..+/", $email) )
-		{ throw new Exception(sprintf('A chave de e-mail `%s` está inválida.', $email)); }
+		$email = str_replace(' ', '@', $email);
+		return filter_var($email, FILTER_VALIDATE_EMAIL);
 	}
 
 	/**
@@ -190,14 +209,16 @@ class Parser
 	 * 
 	 * @since 1.0.0
 	 * @param string $phone Pix key value.
-	 * @throws Exception
+	 * @return bool
 	 */
-	public static function validatePhone ( string $phone )
+	public static function validatePhone ( string $phone ) : bool
 	{
 		$parsed = self::parsePhone($phone);
 
-		if ( !preg_match('/^(\+55)(\d{10,11})$/', $parsed) )
-		{ throw new Exception(sprintf('A chave de telefone `%s` está inválida.', $phone)); }
+		if ( !preg_match('/^(\+55)?(\d{10,11})$/', $parsed) )
+		{ return false; }
+
+		return true;
 	}
 
 	/**
@@ -241,10 +262,16 @@ class Parser
 	 * 
 	 * @since 1.0.0
 	 * @param string $email
+	 * @param string $replaceAt replaces the @ character to space
 	 * @return string
 	 */
-	public static function parseEmail ( string $email ) : string
-	{ return str_replace('@', ' ', $email); }
+	public static function parseEmail ( string $email, bool $replaceAt = false ) : string
+	{ 
+		if ( !$replaceAt )
+		{ return $email; }
+
+		return str_replace('@', ' ', $email); 
+	}
 
 	/**
 	 * Parse any phone string to a correct phone format.
@@ -258,5 +285,34 @@ class Parser
 		$phone = str_replace('+55', '', $phone);
 		$phone = preg_replace('/[^\d]+/', '', $phone);
 		return '+55'.$phone;
+	}
+
+	/**
+	 * Return the key type based in the pix key.
+	 * 
+	 * @since 1.1.0
+	 * @param string $pixKey
+	 * @return string
+	 * @throws Exception When an invalid type is found.
+	 */
+	public static function getKeyType ( string $pixKey ) : string
+	{
+		// Valid uuid-v4
+		if ( self::validateRandom($pixKey) )
+		{ return self::KEY_TYPE_RANDOM; }
+
+		// Valid e-mail
+		if ( self::validateEmail($pixKey) )
+		{ return self::KEY_TYPE_EMAIL; }
+
+		// Valid CPF or CNPJ
+		if ( self::validateCpf($pixKey) || self::validateCnpj($pixKey) )
+		{ return self::KEY_TYPE_DOCUMENT; }
+
+		// Any type of phone
+		if ( self::validatePhone($pixKey) )
+		{ return self::KEY_TYPE_PHONE; }
+
+		throw new Exception(sprintf('Não é possível determinar o tipo da chave `%s`', $pixKey));
 	}
 }

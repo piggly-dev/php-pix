@@ -56,6 +56,15 @@ class Payload
 	const OUTPUT_SVG = QRCode::OUTPUT_MARKUP_SVG;
 	/** @var string OUTPUT_PNG Return QR Code in PNG. */
 	const OUTPUT_PNG = QRCode::OUTPUT_IMAGE_PNG;
+
+	/** @var int */
+	const ECC_L = 0b01; // 7%.
+	/** @var int */
+	const ECC_M = 0b00; // 15%.
+	/** @var int */
+	const ECC_Q = 0b11; // 25%.
+	/** @var int */
+	const ECC_H = 0b10; // 30%.
 	
 	/**
 	 * Pix key.
@@ -109,9 +118,60 @@ class Payload
 	/**
 	 * The current pix code mounted.
 	 * @since 1.0.0
-	 * @var boolean
+	 * @var string
 	 */
 	protected $pixCode = null;
+
+	/**
+	 * Defines if e-mail needs whitespace
+	 * @since 1.1.0
+	 * @var boolean
+	 */
+	protected $emailWhitespace = false;
+
+	/**
+	 * Defines if needs to convert characters to only valid characters.
+	 * @since 1.1.0
+	 * @var boolean
+	 */
+	protected $validCharacters = false;
+
+	/**
+	 * Defines if needs to uppercase data.
+	 * @since 1.1.0
+	 * @var boolean
+	 */
+	protected $upper = false;
+
+	/**
+	 * Replaces the @ character in e-mail key to a space.
+	 * 
+	 * @param bool $apply
+	 * @since 1.1.0
+	 * @return self
+	 */
+	public function applyEmailWhitespace ( bool $apply = true ) : self
+	{ $this->emailWhitespace = $apply; return $this; }
+
+	/**
+	 * Replaces any invalid character to a valid character.
+	 * 
+	 * @param bool $apply
+	 * @since 1.1.0
+	 * @return self
+	 */
+	public function applyValidCharacters ( bool $apply = true ) : self
+	{ $this->validCharacters = $apply; return $this; }
+
+	/**
+	 * Replaces any invalid character to a valid character.
+	 * 
+	 * @param bool $apply
+	 * @since 1.1.0
+	 * @return self
+	 */
+	public function applyUppercase ( bool $apply = true ) : self
+	{ $this->upper = $apply; return $this; }
 
 	/**
 	 * Set the current pix key.
@@ -124,12 +184,17 @@ class Payload
 	 * @return self
 	 * @throws Exception
 	 */
-	public function setPixKey ( string $keyType, string $pixKey )
+	public function setPixKey ( string $keyType, string $pixKey ) : self
 	{
 		// Validate Key
 		Parser::validate($keyType, $pixKey);
-		// Parse Key
-		$this->pixKey = Parser::parse($keyType, $pixKey); 
+
+		// Parses key
+		if ( $keyType === Parser::KEY_TYPE_EMAIL )
+		{ $this->pixKey = Parser::parseEmail($pixKey, $this->emailWhitespace); }
+		else 
+		{ $this->pixKey = Parser::parse($keyType, $pixKey); }
+
 		return $this; 
 	}
 
@@ -143,8 +208,11 @@ class Payload
 	 * @since 1.0.0
 	 * @return self
 	 */
-	public function setDescription ( string $description )
-	{ $this->description = $this->applyLength($description, 36); return $this; }
+	public function setDescription ( string $description ) : self
+	{ 
+		$this->description = $this->applyLength( $this->replacesChar( $this->uppercase( $description ) ), 36); 
+		return $this; 
+	}
 
 	/**
 	 * Set the current pix merchant name.
@@ -158,8 +226,11 @@ class Payload
 	 * @since 1.0.3 Removed applyLength function.
 	 * @return self
 	 */
-	public function setMerchantName ( string $merchantName )
-	{ $this->merchantName = $merchantName; return $this; }
+	public function setMerchantName ( string $merchantName ) : self
+	{ 
+		$this->merchantName = $this->replacesChar( $this->uppercase( $merchantName ) ); 
+		return $this; 
+	}
 
 	/**
 	 * Set the current pix merchant city.
@@ -173,8 +244,11 @@ class Payload
 	 * @since 1.0.3 Removed applyLength function.
 	 * @return self
 	 */
-	public function setMerchantCity ( string $merchantCity )
-	{ $this->merchantCity = $merchantCity; return $this; }
+	public function setMerchantCity ( string $merchantCity ) : self
+	{ 
+		$this->merchantCity = $this->replacesChar( $this->uppercase( $merchantCity ) ); 
+		return $this; 
+	}
 
 	/**
 	 * Set the current pix transaction id.
@@ -186,8 +260,11 @@ class Payload
 	 * @since 1.0.0
 	 * @return self
 	 */
-	public function setTid ( string $tid )
-	{ $this->tid = $this->applyLength($tid, 25); return $this; }
+	public function setTid ( string $tid ) : self
+	{ 
+		$this->tid = $this->applyLength( $this->replacesChar( $this->uppercase( $tid ) ), 25);
+		return $this; 
+	}
 
 	/**
 	 * Set the current pix transaction amount.
@@ -200,7 +277,7 @@ class Payload
 	 * @return self
 	 * @throws Exception When amount is greater than max length.
 	 */
-	public function setAmount ( float $amount )
+	public function setAmount ( float $amount ) : self
 	{ $this->amount = $this->applyLength((string) number_format( $amount, 2, '.', '' ), 13, true); return $this; }
 
 	/**
@@ -212,7 +289,7 @@ class Payload
 	 * @since 1.0.0
 	 * @return self
 	 */
-	public function setAsReusable ( bool $reusable = true )
+	public function setAsReusable ( bool $reusable = true ) : self
 	{ $this->reusable = $reusable; return $this; }
 
 	/**
@@ -250,10 +327,10 @@ class Payload
 	 * @return string
 	 * @throws Exception When something went wrong.
 	 */
-	public function getQRCode ( string $imageType = self::OUTPUT_SVG ) : string
+	public function getQRCode ( string $imageType = self::OUTPUT_SVG, int $ecc = self::ECC_M ) : string
 	{ 
 		$options = new QROptions([
-			'outputLevel' => QRCode::ECC_M,
+			'outputLevel' => $ecc,
 			'outputType' => $imageType
 		]);
 
@@ -506,6 +583,41 @@ class Payload
 
 		$valueSize = str_pad( mb_strlen($value), 2, '0', STR_PAD_LEFT );
 		return $id.$valueSize.$value;
+	}
+
+	/**
+	 * Replaces any invalid character to a valid one.
+	 * 
+	 * @since 1.1.0
+	 * @param string $str
+	 * @return string
+	 */
+	private function uppercase ( string $str ) : string
+	{
+		if ( !$this->upper )
+		{ return $str; }
+
+		return mb_strtoupper($str);
+	}
+
+	/**
+	 * Replaces any invalid character to a valid one.
+	 * 
+	 * @since 1.1.0
+	 * @param string $str
+	 * @return string
+	 */
+	private function replacesChar ( string $str ) : string
+	{
+		if ( !$this->validCharacters )
+		{ return $str; }
+
+		$invalid = array("Á", "À", "Â", "Ä", "Ă", "Ā", "Ã", "Å", "Ą", "Æ", "Ć", "Ċ", "Ĉ", "Č", "Ç", "Ď", "Đ", "Ð", "É", "È", "Ė", "Ê", "Ë", "Ě", "Ē", "Ę", "Ə", "Ġ", "Ĝ", "Ğ", "Ģ", "á", "à", "â", "ä", "ă", "ā", "ã", "å", "ą", "æ", "ć", "ċ", "ĉ", "č", "ç", "ď", "đ", "ð", "é", "è", "ė", "ê", "ë", "ě", "ē", "ę", "ə", "ġ", "ĝ", "ğ", "ģ", "Ĥ", "Ħ", "Í", "Ì", "İ", "Î", "Ï", "Ī", "Į", "Ĳ", "Ĵ", "Ķ", "Ļ", "Ł", "Ń", "Ň", "Ñ", "Ņ", "Ó", "Ò", "Ô", "Ö", "Õ", "Ő", "Ø", "Ơ", "Œ", "ĥ", "ħ", "ı", "í", "ì", "î", "ï", "ī", "į", "ĳ", "ĵ", "ķ", "ļ", "ł", "ń", "ň", "ñ", "ņ", "ó", "ò", "ô", "ö", "õ", "ő", "ø", "ơ", "œ", "Ŕ", "Ř", "Ś", "Ŝ", "Š", "Ş", "Ť", "Ţ", "Þ", "Ú", "Ù", "Û", "Ü", "Ŭ", "Ū", "Ů", "Ų", "Ű", "Ư", "Ŵ", "Ý", "Ŷ", "Ÿ", "Ź", "Ż", "Ž", "ŕ", "ř", "ś", "ŝ", "š", "ş", "ß", "ť", "ţ", "þ", "ú", "ù", "û", "ü", "ŭ", "ū", "ů", "ų", "ű", "ư", "ŵ", "ý", "ŷ", "ÿ", "ź", "ż", "ž");
+		$valid   = array("A", "A", "A", "A", "A", "A", "A", "A", "A", "AE", "C", "C", "C", "C", "C", "D", "D", "D", "E", "E", "E", "E", "E", "E", "E", "E", "G", "G", "G", "G", "G", "a", "a", "a", "a", "a", "a", "a", "a", "a", "ae", "c", "c", "c", "c", "c", "d", "d", "d", "e", "e", "e", "e", "e", "e", "e", "e", "g", "g", "g", "g", "g", "H", "H", "I", "I", "I", "I", "I", "I", "I", "IJ", "J", "K", "L", "L", "N", "N", "N", "N", "O", "O", "O", "O", "O", "O", "O", "O", "CE", "h", "h", "i", "i", "i", "i", "i", "i", "i", "ij", "j", "k", "l", "l", "n", "n", "n", "n", "o", "o", "o", "o", "o", "o", "o", "o", "o", "R", "R", "S", "S", "S", "S", "T", "T", "T", "U", "U", "U", "U", "U", "U", "U", "U", "U", "U", "W", "Y", "Y", "Y", "Z", "Z", "Z", "r", "r", "s", "s", "s", "s", "B", "t", "t", "b", "u", "u", "u", "u", "u", "u", "u", "u", "u", "u", "w", "y", "y", "y", "z", "z", "z");
+		$str     = str_ireplace( $invalid, $valid, $str );
+		$str     = preg_replace('/[\!\.\,\@\#\$\%\&\*\(\)\/\*\?]+/', '', $str);
+
+		return $str;
 	}
 
 	/**
