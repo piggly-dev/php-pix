@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+* Alinhamento com a última versão do Pix e tratamento do `tid`;
+
 ## 1.1.1
 
 * Suporte para PHP 7.2

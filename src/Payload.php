@@ -145,10 +145,11 @@ class Payload
 
 	/**
 	 * Replaces the @ character in e-mail key to a space.
-	 * 
+	 * DEPRECATED:
 	 * @param bool $apply
 	 * @since 1.1.0
 	 * @return self
+	 * @deprecated Aplica-se apenas as versões Pix anteriores a 2.
 	 */
 	public function applyEmailWhitespace ( bool $apply = true ) : self
 	{ $this->emailWhitespace = $apply; return $this; }
@@ -258,11 +259,12 @@ class Payload
 	 * 
 	 * @param string $tid Pix transaction id.
 	 * @since 1.0.0
+	 * @since 1.1.2 Formata o transaction id para formato válido.
 	 * @return self
 	 */
 	public function setTid ( string $tid ) : self
 	{ 
-		$this->tid = $this->applyLength( $this->replacesChar( $this->uppercase( $tid ) ), 25);
+		$this->tid = $this->applyLength( $tid, 25);
 		return $this; 
 	}
 
@@ -513,7 +515,7 @@ class Payload
 		// Current pix transaction id
 		$tid = $this->formatID(
 			self::ID_ADDITIONAL_DATA_FIELD_TEMPLATE_TID,
-			$this->tid,
+			Parser::parseTid( $this->tid ),
 			false
 		);
 

@@ -6,6 +6,8 @@ O **Pix** é o mais novo método de pagamento eletrônico criado pelo **Banco Ce
 
 Essa biblioteca foi criada para ser utilizada principalmente com o plugin de **Woocommerce** [Pix por Piggly](https://wordpress.org/plugins/pix-por-piggly/). Mas, pode ser utilizada em qualquer sistema onde seja necessário a criação de payloads, códigos e QRCodes Pix.
 
+* Compatível com o Pix versão 2.2.1, veja mais detalhes [clicando aqui](https://www.bcb.gov.br/content/estabilidadefinanceira/pix/Regulamento_Pix/II-ManualdePadroesparaIniciacaodoPix.pdf).
+
 > Confira também nossa micro interface pix em [piggly/php-pix-app](https://github.com/piggly-dev/php-pix-app)
 
 > Se você apreciar a função desta biblioteca e quiser apoiar este trabalho, sinta-se livre para fazer qualquer doação para a chave aleatória Pix `aae2196f-5f93-46e4-89e6-73bf4138427b` ❤.
@@ -69,7 +71,9 @@ Cada campo **EMV®1** contém suas especificações, entre elas o tamanho do cam
 * Chave de E-mail com um valor válido;
 * Chave de Telefone com um valor válido e apenas `numérico`.
 
-> Alguns bancos podem ou não aceitar o caractere `@` para Chaves de E-mail. Atualizamos o plugin para ativar a substituição do `@` por espaço no e-mail `$pix->applyEmailWhitespace()` sinta-se livre para fazer os testes com a sua chave pix.
+> Alguns bancos, por trabalharem com versões antigas do Pix, podem ou não aceitar o caractere `@` para Chaves de E-mail. Atualizamos a biblioteca para ativar a substituição do `@` por espaço no e-mail `$pix->applyEmailWhitespace()` sinta-se livre para fazer os testes com a sua chave pix.
+
+> A partir das versões mais recentes do Pix, ocorreram mudanças no ID da transação para QR Codes estáticos, são elas descritas: O objeto primitivo EMV 62-05 Reference Label, conforme especificado no manual do BR Code, é limitado a 25 caracteres [...] Os caracteres permitidos no contexto do Pix para o campo txid (EMV 62-05) são: `[a-zA-Z0-9]` [...] se o gerador do QR optar por não utilizar um transactionID, o valor "***" deverá ser usado para indicar essa escolha.
 
 ### Classe `Parser`
 
@@ -85,9 +89,9 @@ A classe `Parser` apresenta todos os métodos como `static` e segue o seguinte f
 
 A classe `Payload` é responsável por montar o payload do Pix e segute o seguinte formato:
 
-* O método `applyEmailWhitespace()` determina que o `@` deve ser substituido por um espaço;
-* O método `applyValidCharacters()` determina que acentos e caracteres inválidos como `[\!\.\,\@\#\$\%\&\*\(\)\/\*\?]` deve ser removidos/substituídos nos campos do Pix. Esse efeito é aplicado em `description`, `merchantName`, `merchantCity` e `tid`;
-* * O método `applyUppercase()` transformas todos os caracteres dos campos em maiúsculo. Esse efeito é aplicado em `description`, `merchantName`, `merchantCity` e `tid`;
+* O método `applyEmailWhitespace()` determina que o `@` deve ser substituido por um espaço (para bancos que utilizem versões não atualizadas do Pix);
+* O método `applyValidCharacters()` determina que acentos e caracteres inválidos como `[\!\.\,\@\#\$\%\&\*\(\)\/\*\?]` deve ser removidos/substituídos nos campos do Pix. Esse efeito é aplicado em `description`, `merchantName` e `merchantCity`;
+* * O método `applyUppercase()` transformas todos os caracteres dos campos em maiúsculo. Esse efeito é aplicado em `description`, `merchantName` e `merchantCity`;
 * Métodos com `set` determinam valores para os atributos do Pix;
 * O método `getPixCode()` retorna o código Pix em formato de texto;
 * O método `getQRCode()` retorna uma `string` formatada em `base64`. A saída pode ser controlada com os valores `Payload::OUTPUT_*` para o formato de saída do QR Code e, também, os valores `Payload::ECC_*` para controlar as porcentagens de perca de dados do QR Code.
@@ -132,12 +136,13 @@ Algumas chaves que encontramos incompatibilidades para determinados bancos:
 
 * E-mail: alguns bancos aceitam `@`, outros aceitam espaço e outros aceitam ambos;
 * Telefone: alguns bancos aceitam `+55`, outros ignoram e outros aceitam com e sem `+55`;
+* Transaction ID (tid): alguns bancos não aceitam caracteres diferentes `[a-zA-Z0-9]`, enquanto outros aceitam;
 
 ### Divergências entre Pix Copia & Cola e QR Codes
 
 Há alguns relatos que alguns bancos leem o **QR Code**, mas não leem o **Pix Copia & Cola**. Este não é um problema da biblioteca, o código Pix de ambos são o mesmo! Caso esteja curioso, abra um leitor de QR Code e leia o código é examente o mesmo que o **Pix Copia & Cola**.
 
-Nesse caso, tente utilizar as funções corretivas como `applyEmailWhitespace()`, `applyValidCharacters()` e `applyUppercase()`. Alguns bancos podem ter leituras diferentes e, talvez, existam caracteres inválidos para a leitura do **Pix Copia & Cola**.
+Nesse caso, tente utilizar as funções corretivas como `applyEmailWhitespace()`, `applyValidCharacters()` e `applyUppercase()`. Seu `tid` será automaticamente corrigido para o formato correto. Alguns bancos podem ter leituras diferentes e, talvez, existam caracteres inválidos para a leitura do **Pix Copia & Cola**.
 
 ## Como utilizar?
 

@@ -53,40 +53,40 @@ class Parser
 	 * Validate a $value based in the respective pix $key.
 	 * 
 	 * @since 1.0.0
-	 * @param string $key Pix key.
-	 * @param string $value Pix value.
+	 * @param string $keyType Pix key type.
+	 * @param string $value Pix key value.
 	 * @throws Exception
 	 */
-	public static function validate ( string $key, string $value )
+	public static function validate ( string $keyType, string $keyValue )
 	{
-		if ( !in_array($key, [self::KEY_TYPE_RANDOM, self::KEY_TYPE_DOCUMENT, self::KEY_TYPE_EMAIL, self::KEY_TYPE_PHONE]) )
-		{ throw new Exception(sprintf('A chave `%s` é desconhecida.', $key)); }
+		if ( !in_array($keyType, [self::KEY_TYPE_RANDOM, self::KEY_TYPE_DOCUMENT, self::KEY_TYPE_EMAIL, self::KEY_TYPE_PHONE]) )
+		{ throw new Exception(sprintf('A chave `%s` é desconhecida.', $keyType)); }
 
 		$validate = false;
 		$alias    = 'Chave Desconhecida';
 
-		switch ( $key )
+		switch ( $keyType )
 		{
 			case self::KEY_TYPE_RANDOM:
-				$validate = self::validateRandom($value);
-				$alias    = self::getAlias($key);
+				$validate = self::validateRandom($keyValue);
+				$alias    = self::getAlias($keyType);
 				break;
 			case self::KEY_TYPE_DOCUMENT:
-				$validate = self::validateDocument($value);
-				$alias    = self::getAlias($key);
+				$validate = self::validateDocument($keyValue);
+				$alias    = self::getAlias($keyType);
 				break;
 			case self::KEY_TYPE_EMAIL:
-				$validate = self::validateEmail($value);
-				$alias    = self::getAlias($key);
+				$validate = self::validateEmail($keyValue);
+				$alias    = self::getAlias($keyType);
 				break;
 			case self::KEY_TYPE_PHONE:
-				$validate = self::validatePhone($value);
-				$alias    = self::getAlias($key);
+				$validate = self::validatePhone($keyValue);
+				$alias    = self::getAlias($keyType);
 				break;
 		}
 
 		if ( !$validate )
-		{ throw new Exception(sprintf('O valor `%s` para %s está inválido.', $alias, $value)); }
+		{ throw new Exception(sprintf('O valor `%s` para %s está inválido.', $alias, $keyValue)); }
 	}
 
 	/**
@@ -285,6 +285,21 @@ class Parser
 		$phone = str_replace('+55', '', $phone);
 		$phone = preg_replace('/[^\d]+/', '', $phone);
 		return '+55'.$phone;
+	}
+
+	/**
+	 * Parse transaction id string to valid characters.
+	 * 
+	 * @since 1.1.2
+	 * @param string $phone
+	 * @return string
+	 */
+	public static function parseTid ( string $tid = null )
+	{
+		if ( empty($tid) )
+		{ return '***'; }
+
+		return preg_replace('/[^A-Za-z0-9]+/', '', $tid);
 	}
 
 	/**
