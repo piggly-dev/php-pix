@@ -169,7 +169,7 @@ class PayloadTest extends TestCase
 	/** @test */
 	public function throwExceptionWhenInvalidPixKey ()
 	{
-		$this->expectExceptionMessage('A chave aleatória `0000` está inválida.');
+		$this->expectExceptionMessage('O valor `Chave Aleatória` para 0000 está inválido.');
 
 		(new Payload())
 			->setPixKey($this->pixData['keyType'], '0000')
