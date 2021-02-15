@@ -4,6 +4,9 @@ namespace Piggly\Pix;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use Exception;
+use Piggly\Pix\Exceptions\EmvIdIsRequiredException;
+use Piggly\Pix\Exceptions\InvalidEmvFieldException;
+use Piggly\Pix\Exceptions\InvalidPixKeyTypeException;
 use Piggly\Pix\Parser;
 
 /**
@@ -97,9 +100,10 @@ class Payload
 	/**
 	 * Pix Transaction ID.
 	 * @since 1.0.0
+	 * @since Set *** as default value.
 	 * @var string
 	 */
-	protected $tid;
+	protected $tid = '***';
 
 	/**
 	 * Transaction amount.
@@ -113,7 +117,7 @@ class Payload
 	 * @since 1.0.0
 	 * @var boolean
 	 */
-	protected $reusable = false;
+	protected $reusable = true;
 
 	/**
 	 * The current pix code mounted.
@@ -145,9 +149,10 @@ class Payload
 
 	/**
 	 * Replaces the @ character in e-mail key to a space.
-	 * DEPRECATED:
+	 * 
 	 * @param bool $apply
 	 * @since 1.1.0
+	 * @since 1.2.0 Descontinuada.
 	 * @return self
 	 * @deprecated Aplica-se apenas as versões Pix anteriores a 2.
 	 */
@@ -182,8 +187,10 @@ class Payload
 	 * @param string $keyType Pix key type.
 	 * @param string $pixKey Pix key.
 	 * @since 1.0.0
+	 * @since 1.2.0 Custom exception errors.
 	 * @return self
-	 * @throws Exception
+	 * @throws InvalidPixKeyTypeException When pix key type is invalid.
+	 * @throws InvalidPixKeyException When pix key is invalid base in key type.
 	 */
 	public function setPixKey ( string $keyType, string $pixKey ) : self
 	{
@@ -203,15 +210,30 @@ class Payload
 	 * Set the current pix description.
 	 * 
 	 * EMV -> ID 26 . ID 02
-	 * Max length 36
+	 * Max length 40
+	 * 
+	 * Merchant Account Information has size limit as 99
+	 * characters including:
+	 * 
+	 * GUI ID+SIZE = 04 chars
+	 * KEY ID+SIZE = 04 chars
+	 * GUI SIZE = 14 chars
+	 * KEY SIZE = 00..36 chars
+	 * 
+	 * The number of chars which has left will be vary based
+	 * in GUI + KEY size. Which means at least it will have
+	 * 40 chars available to description field. 
+	 * 
+	 * That's why we choose 40 chars as max length size.
 	 * 
 	 * @param string $description Pix description.
 	 * @since 1.0.0
+	 * @since 1.2.0 Max size limit increased to 40 chars.
 	 * @return self
 	 */
 	public function setDescription ( string $description ) : self
 	{ 
-		$this->description = $this->applyLength( $this->replacesChar( $this->uppercase( $description ) ), 36); 
+		$this->description = $this->applyLength('Description', $this->replacesChar( $this->uppercase( $description ) ), 40); 
 		return $this; 
 	}
 
@@ -257,16 +279,38 @@ class Payload
 	 * EMV -> ID 62 . ID 05
 	 * Max length 25
 	 * 
-	 * @param string $tid Pix transaction id.
+	 * When $tid is null, Parser::getRandom() will generate
+	 * an unique transaction id. You can still use Parse::getRandom()
+	 * as parameter of this method.
+	 * 
+	 * A static pix code created including a transaction id, 
+	 * can be consulted by usign an pix api.
+	 * 
+	 * @param string|null $tid Pix transaction id.
 	 * @since 1.0.0
-	 * @since 1.1.2 Formata o transaction id para formato válido.
+	 * @since 1.2.0 Generate a random string when $tid is null.
 	 * @return self
 	 */
-	public function setTid ( string $tid ) : self
+	public function setTid ( ?string $tid ) : self
 	{ 
-		$this->tid = $this->applyLength( $tid, 25);
+		if ( is_null( $tid ) )
+		{ $this->tid = Parser::getRandom(); }
+		else
+		{ $this->tid = $this->applyLength('Tid', $tid, 25); }
+
 		return $this; 
 	}
+
+	/**
+	 * Get the current transaction id. When setTid() was set to
+	 * null, Parser::getRandom() will generate an unique transaction id.
+	 * You may need to know this transaction id.
+	 * 
+	 * @since 1.2.0
+	 * @return string
+	 */
+	public function getTid () : string
+	{ return $this->tid; }
 
 	/**
 	 * Set the current pix transaction amount.
@@ -276,11 +320,12 @@ class Payload
 	 * 
 	 * @param string $amount Pix transaction amount.
 	 * @since 1.0.0
+	 * @since 1.2.0 Custom exception error.
 	 * @return self
-	 * @throws Exception When amount is greater than max length.
+	 * @throws InvalidEmvFieldException When amount is greater than max length.
 	 */
 	public function setAmount ( float $amount ) : self
-	{ $this->amount = $this->applyLength((string) number_format( $amount, 2, '.', '' ), 13, true); return $this; }
+	{ $this->amount = $this->applyLength('Amount', (string) number_format( $amount, 2, '.', '' ), 13, true); return $this; }
 
 	/**
 	 * Set the if the current pix can or can not be reusable.
@@ -289,6 +334,7 @@ class Payload
 	 * 
 	 * @param string $reusable If pix can be reusable.
 	 * @since 1.0.0
+	 * @since 1.2.0 not change $reusable variable anymore
 	 * @return self
 	 */
 	public function setAsReusable ( bool $reusable = true ) : self
@@ -298,8 +344,9 @@ class Payload
 	 * Get the current pix code.
 	 * 
 	 * @since 1.0.0
+	 * @since 1.2.0 Custom exception error.
 	 * @return string
-	 * @throws Exception When something went wrong.
+	 * @throws EmvIdIsRequiredException When some field is invalid.
 	 */
 	public function getPixCode () : string
 	{
@@ -365,15 +412,15 @@ class Payload
 	{
 		return 
 			$this->reusable ?
-				// Unique
-				$this->formatID(
-					self::ID_POINT_OF_INITIATION_METHOD,
-					'12'
-				) :
 				// Reusable
 				$this->formatID(
 					self::ID_POINT_OF_INITIATION_METHOD,
 					'11'
+				) :
+				// Unique
+				$this->formatID(
+					self::ID_POINT_OF_INITIATION_METHOD,
+					'12'
 				);
 	}
 
@@ -536,14 +583,14 @@ class Payload
 	protected function getCRC16 ( string $payload )
 	{
 		// Standard data
-		$payload .= self::ID_CRC16.'04';
+		$payload .= self::ID_CRC16.'04'; 
 
 		// Standard values by BACEN
 		$polynomial = 0x1021;
 		$response   = 0xFFFF;
 
 		// Checksum
-		if ( ( $length = strlen($payload ) ) > 0 ) 
+		if ( ( $length = strlen($payload) ) > 0 ) 
 		{
 			for ( $offset = 0; $offset < $length; $offset++ ) 
 			{
@@ -567,18 +614,19 @@ class Payload
 	 * Return formated data following the EMV patterns.
 	 * 
 	 * @since 1.0.0
+	 * @since 1.2.0 EMV field is required.
 	 * @param string $id Data ID.
 	 * @param string|null $value Data value.
 	 * @param bool $required When data value is required.
 	 * @return string Formated data.
-	 * @throws Exception When value is empty and required.
+	 * @throws EmvIdIsRequiredException When value is empty and required.
 	 */
 	protected function formatID ( string $id, $value, bool $required = true ) : string 
 	{
 		if ( empty( $value ) )
 		{ 
 			if ( $required ) 
-			{ throw new Exception(sprintf('O id `%s` não pode ser vazio.', $id)); }
+			{ throw new EmvIdIsRequiredException($id); }
 			else 
 			{ return ''; } 
 		}
@@ -626,18 +674,20 @@ class Payload
 	 * Cut data more than $maxLength.
 	 * 
 	 * @since 1.0.0
+	 * @since 1.2.0 Added $emvField and custom exception.
+	 * @param string $emvField
 	 * @param string $value
 	 * @param int $maxLength
 	 * @param bool $throws To throw exception when exceed.
 	 * @return string
-	 * @throws Exception When value exceed max length.
+	 * @throws InvalidEmvFieldException When value exceed max length.
 	 */
-	private function applyLength ( string $value, int $maxLength = 25, bool $throws = false )
+	private function applyLength ( string $emvField, string $value, int $maxLength = 25, bool $throws = false )
 	{
 		if ( strlen($value) > $maxLength )
 		{ 
 			if ( $throws )
-			{ throw new Exception(sprintf('O valor `%s` excede o limite do campo.')); }
+			{ throw new InvalidEmvFieldException($emvField, $value, sprintf('Excede o limite de %s caracteres.', $maxLength)); }
 
 			return substr($value, 0, 25);
 		}

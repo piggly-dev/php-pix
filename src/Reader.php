@@ -1,6 +1,10 @@
 <?php
 namespace Piggly\Pix;
 
+use Exception;
+use Piggly\Pix\Exceptions\CannotParseKeyTypeException;
+use Piggly\Pix\Exceptions\InvalidPixCodeException;
+
 /**
  * The Pix Reader class.
  * 
@@ -26,7 +30,7 @@ class Reader
 	 * @since 1.1.0
 	 * @var string
 	 */
-	protected $pixCode;
+	protected $pixCode = '';
 
 	/**
 	 * Pix code.
@@ -53,11 +57,16 @@ class Reader
 	 * children too.
 	 * 
 	 * @since 1.1.0
+	 * @since 1.2.0 Custom exception; Throw exception when pix code is invalid.
 	 * @param string $pixCode Current pix code to extract...
 	 * @return self
+	 * @throws InvalidPixCodeException When pix code is invalid.
 	 */
 	public function extract ( string $pixCode ) : self
 	{
+		if ( !$this->isValidCode($pixCode) )
+		{ throw new InvalidPixCodeException($pixCode); }
+
 		$this->pixCode = $pixCode; 
 		$this->raw     = $pixCode; 
 		$this->emvs    = [];
@@ -120,6 +129,91 @@ class Reader
 	 */
 	public function getEMVs () : array 
 	{ return $this->emvs; }
+
+	/**
+	 * Will export EMVs to a payload object.
+	 * 
+	 * @since 1.2.0
+	 * @return Payload
+	 * @throws InvalidPixCodeException
+	 * @throws CannotParseKeyTypeException
+	 */
+	public function export () : Payload
+	{
+		if ( !$this->isValidCode($this->raw) )
+		{ throw new InvalidPixCodeException($this->raw); }
+
+		$poi = $this->getPointOfInitiation();
+
+		if ( $poi === '11' )
+		{
+			// Static
+			$payload = new StaticPayload();
+
+			$merchantName = $this->getMerchantName();
+			$merchantCity = $this->getMerchantCity();
+			$pixKey       = $this->getPixKey();
+			$pixKeyType   = Parser::getKeyType($this->getPixKey());
+			$description  = $this->getDescription();
+			$amount       = $this->getAmount();
+			$tid          = $this->getTid();
+
+			if ( !empty($merchantName) )
+			{ $payload->setMerchantName($merchantName); }
+
+			if ( !empty($merchantCity) )
+			{ $payload->setMerchantCity($merchantCity); }
+
+			if ( !empty($pixKey) )
+			{ $payload->setPixKey($pixKeyType, $pixKey); }
+
+			if ( !empty($description) )
+			{ $payload->setDescription($description); }
+
+			if ( !empty($amount) )
+			{ $payload->setAmount($amount); }
+
+			if ( !empty($tid) )
+			{ $payload->setTid($tid); }
+		}
+		else 
+		{
+			// Dynamic
+			$payload = new DynamicPayload();
+
+			$merchantName = $this->getMerchantName();
+			$merchantCity = $this->getMerchantCity();
+			$amount       = $this->getAmount();
+			$tid          = $this->getTid();
+
+			if ( !empty($merchantName) )
+			{ $payload->setMerchantName($merchantName); }
+
+			if ( !empty($merchantCity) )
+			{ $payload->setMerchantCity($merchantCity); }
+
+			if ( !empty($amount) )
+			{ $payload->setAmount($amount); }
+		}
+
+		return $payload;
+	}
+
+	/**
+	 * Get current point of initiation
+	 * 
+	 * @since 1.1.0
+	 * @return string|null
+	 */
+	public function getPointOfInitiation () : ?string
+	{
+		$emv = $this->findEMV( Payload::ID_POINT_OF_INITIATION_METHOD );
+
+		if ( !empty( $emv ) )
+		{ return $emv['value']; }
+
+		return '11';
+	}
 
 	/**
 	 * Get current Pix Key.
@@ -288,4 +382,12 @@ class Reader
 		$code = mb_substr($code, $size );
 		return $extracted; 
 	}
+
+	/**
+	 * Validates if pix code is QRCPS-MPM version.
+	 * 
+	 * @return bool
+	 */
+	protected function isValidCode ( string $pixCode ) : bool
+	{ return strpos($pixCode, '000201') !== false; }
 }

@@ -16,6 +16,140 @@ Essa biblioteca foi criada para ser utilizada principalmente com o plugin de **W
 
 Essa biblioteca pode ser instalada via **Composer** com `composer require piggly/php-pix`;
 
+### Atualização das versões < 1.1.* para 1.2.0
+
+Muitas alterações aconteceram. Abaixo descrevemos por classes o que mudou, o que continuou e como isso afeta o seu antigo código:
+
+#### Tratamento de Exceções
+
+Antes, todos os erros no código retornavam um objeto simples `Exception` com uma mensagem sobre mais detalhes. Mas, agora, dividimos as principais exceções entre alguns tipos de objetos, são eles:
+
+* `CannotParseKeyTypeException`: Impossível determinar o tipo da chave Pix;
+* `EmvIdIsRequiredException`: O campo EMV não foi preenchdo e é obrigatório;
+* `InvalidCobFieldException`: Algum campo COB está inválido;
+* `InvalidEmvFieldException`: Algum campo EMV está inválido;
+* `InvalidFieldException`: Algum campo está inválido;
+* `InvalidPixCodeException`: O código Pix recebido é inválido;
+* `InvalidPixKeyException`: A chave Pix informada é incompatível com o tipo;
+* `InvalidPixKeyTypeException`: O tipo de chave Pix informado é inválido.
+
+> As classes acima possuem métodos `get*()` personalizados para você obter de forma mais precisa dos dados de erros equivalentes.
+
+> Se você já tratava exceções, nada muda! Exceto que, agora, tem mais controle para tratar determinados tipos de erros.
+
+#### Classe **Reader**
+
+* O método `extract()` resultará em uma exceção `InvalidPixCodeException` se o código Pix não foi um código Pix válido;
+* O método `export()` criará um `Payload` compatível com o código Pix lido.
+
+#### Classe **Parser**
+
+* O método `getKeyType()` resultará em uma excessão `CannotParseKeyTypeException` se não for possível determinar o tipo da chave Pix;
+* Os métodos `validateCpf()` e `validateCnpj()` agora são públicos e podem ser utilizados individualmente;
+* O método `getRandom()` cria uma `string` aleatória contendo `25` caracteres entre `[A-Za-z0-9]`;
+* O método `validate()` pode resultar em dois tipos de exceções: `InvalidPixKeyTypeException` quando o tipo da chave é inválido; `InvalidPixKeyException` quando a chave não é compatível com o tipo.
+
+#### Classe **Payload**
+
+* O valor padrão inicial do `tid` sempre será `***` quando não preenchido;
+* O método `setPixKey()` pode resultar em dois tipos de exceções: `InvalidPixKeyTypeException` quando o tipo da chave é inválido; `InvalidPixKeyException` quando a chave não é compatível com o tipo;
+* O método `setDescription()` aceita até `40` caracteres;
+* O método `setTid()` pode receber um valor vazio, quando acontecer, irá gerar um valor aleatório para o ID da transação com o método `Parser::getRandom()`;
+* O método `getTid()` foi adicionado;
+* O método `setAsReusable()` foi **descontinuado** (veja mais detalhes abaixo);
+* Ao definir alguns campos, eles podem retornar a exceção `EmvIdIsRequiredException` se o campo não estiver preenchido ou `InvalidEmvFieldException` se o campo estiver incorreto.
+
+##### Descontinuação do `setAsReusable()`
+
+O método `setAsReusable()` definia se um código Pix era único (dinâmico) ou reutilizável (estático). Ele continua valendo para criações manuais, entretanto, para organização do código, o `Payload` foi dividido em duas classes:
+
+* Classe `StaticPayload`: para códigos Pix estáticos; não muda nada, com excessão que sempre será um código reutilizável e ignora o método `setAsReusable()`;
+* Classe `DynamicPayload`: para códigos Pix dinâmicos; altera o comportamento padrão do `Payload`, pois ignora os métodos `setPixKey()`, `setDescription()` e `setAsReusable()`. Os métodos ainda podem ser chamados, entretanto não alterarão valores no `Payload`. Além disso, acrescenta o método `setPayloadUrl()` com a URL do payload recebido pelo PSP (SPI). Cuidado ao utilizar `setTid()` alguns SPIs aceitam, enquanto outros não.
+
+> A classe **Dynamic Payload** está diretamente associada a um QR Code dinâmico e só pode ser utilizada após criação da cobrança via alguma API Pix. A api será responsável por criar a cobrança no SPI e retornar o `location` (uma URL que contem os dados do pix). Esse `location` deve ser adicionado em `setPayloadUrl()`.
+
+**Exemplo**
+
+```php
+// Montagem de um pix estático
+$payload = (new StaticPayload())
+	->setMerchantName($merchantName)
+	->setMerchantCity($merchantCity)
+	->setPixKey($keyType, $keyValue)
+	->setDescription($description)
+	->setAmount($amount)
+	->setTid($tid);
+
+// Montagem de um pix dinâmico
+$payload = (new DynamicPayload())
+	->setMerchantName($merchantName)
+	->setMerchantCity($merchantCity)
+	->setAmount($amount)
+	->setPayloadUrl($url);
+
+// Lendo um código pix e obtendo o payload
+$payload = (new Reader($pixCode))->export();
+```
+
+#### Classe **CobPayload**
+
+> O problema com as APIs do Pix é que, mesmo com o Banco Central lançando o padrão de comunicação para ser adotado, muitos SPI fazem as coisas do seu jeito. A única maneira de desenvolve uma biblioteca compatível com todas as principais APIs do mercado é tendo acesso a elas. Entendemos que isso está distante do propósito deste projeto. Afinal, cada API deveria ter sua própria biblioteca e então utilizar a nossa para montar os códigos Pix.
+
+> Mas, decidimos implementar a classe `CobPayload` que utiliza o padrão do Banco Central do Brasil. Cada API deveria ter um `Payload` parecido para implementar os métodos. Fique a vontade para criar conforme a API que irá utilizar.
+
+É utilizada para tratamento dos dados da **API Pix** e segue os padrões determinados em [bacen/pix-api](https://github.com/bacen/pix-api). Essa classe auxilia você criar um payload mais limpo, assim como receber os dados da **API Pix** de uma forma muito mais orgânica e organizada.
+
+Além dos métodos para obter/setar dados do `CobPayload`, haverão dois métodos disponíveis sendo eles:
+
+* `export()`: exporta todos os dados da classe `CobPayload` para o array compatível com a **API Pix**;
+* `import()`: importa todos os dados de resposta da **API Pix** para os objetos relacionados criando um `CobPayload` organizado.
+
+O `CobPayload` e as classes deviradas disponíveis em `Entities/Cob/*` são bem flexíveis e fazem a importação/exportação de todos os dados disponíveis conforme os modelos padrões da **API Pix**, não há muito com o que se preocupar.
+
+> Em breve, vamos criar uma documentação detalhada sobre essas classes.
+
+**Exemplo**
+
+```php
+// Não implementamos ainda uma classe $api
+$cobResponse = $api->getCob($tid);
+
+// Cria o cob para normalizar os dados
+$cob = (new CobPayload())->import($cobResponse);
+
+// Nome do recebedor do Pix
+$cob->getSender()->getName();
+// Nome do devedor do Pix
+$cob->getRecipient()->getName();
+// Valor original do Pix
+$cob->getAmount()->getOriginalAmount();
+// Status da cobrança do Pix
+$cob->getStatus();
+// -> exemplos de dados
+
+// Você também pode criar o seu cob e enviar via $api
+$devedor = (new Entities\Cob\Person())->setDocument('12345678930');
+$recebedor = (new Entities\Cob\Person())->setDocument('11222333000100');
+$valor = (new Entities\Cob\Amount())->setOriginalAmount('1.00');
+$calendario = (new Entities\Cob\Calendar())->setDueDate(DateTime::now()->add(new DateInterval('P10D')));
+
+$cob = (new CobPayload())
+	->setSender($recebedor)
+	->setRecipient($devedor)
+	->setAmount($valor)
+	->setCalendar($calendario);
+
+// Não implementamos ainda uma classe $api
+// Envie o payload do cob
+$cobResponse = $api->createCob($cob->export());
+
+// Capture a resposta
+$cob = (new CobPayload())->import($cobResponse);
+
+// E, depois pode convertê-lo para um payload:
+
+```
+
 ### Atualização das versões 1.0.* para 1.1.0
 
 Nenhum método foi alterado ou removido. As mesmas funções foram mantiadas, apenas a lógica interna de determinados métodos foram melhoradas e novas classes e recursos foram acoplados. A migração pode ser realizada tranquilamente e sem problemas. Algumas coisas que mudaram:
@@ -96,6 +230,8 @@ A classe `Payload` é responsável por montar o payload do Pix e segute o seguin
 * O método `getPixCode()` retorna o código Pix em formato de texto;
 * O método `getQRCode()` retorna uma `string` formatada em `base64`. A saída pode ser controlada com os valores `Payload::OUTPUT_*` para o formato de saída do QR Code e, também, os valores `Payload::ECC_*` para controlar as porcentagens de perca de dados do QR Code.
 
+> Agora a classe é subdividida entre duas classes `StaticPayload` e `DynamicPayload`. Para fins de compatibilidade a classe `Payload` poderá ser criada, mas por padrão ela terá o comportamento de um Pix estático `StaticPayload`.
+
 ### Classe `Reader`
 
 > Cada banco determina as informações que a chave Pix terá. Nesses casos, quando o pix é configurado com informações incorretas, podem haver uma série de problemas de compatibilidade. Por conta disso, criamos essa classe.
@@ -106,8 +242,68 @@ A classe `Reader` nasceu para ser um tradutor dos códigos pix. O objetivo é le
 
 * Métodos com `get` determinam valores que podem ser obtidos do código Pix;
 * O método `extract()` executa novamente a extração dos dados de um outro código Pix, por exemplo.
+* O método `export()` exporta os dados Pix obtidos para um Payload compatível, sendo ele `StaticPayload` ou `DynamicPayload`.
 
-> Você pode utilizar esses dados para, a partir de uma chave matriz, gerar um código Pix novo com a classe `Payload`. Assim cada dado será extraído de uma chave válida e não preenchido manualmente evitando erros e incompatíbilidades.
+> Você pode exportar os dados do Reader para um Payload com o método `export()`.
+
+### Classe CobPayload
+
+> O problema com as APIs do Pix é que, mesmo com o Banco Central lançando o padrão de comunicação para ser adotado, muitos SPI fazem as coisas do seu jeito. A única maneira de desenvolve uma biblioteca compatível com todas as principais APIs do mercado é tendo acesso a elas. Entendemos que isso está distante do propósito deste projeto. Afinal, cada API deveria ter sua própria biblioteca e então utilizar a nossa para montar os códigos Pix.
+
+> Mas, decidimos implementar a classe `CobPayload` que utiliza o padrão do Banco Central do Brasil. Cada API deveria ter um `Payload` parecido para implementar os métodos. Fique a vontade para criar conforme a API que irá utilizar.
+
+É utilizada para tratamento dos dados da **API Pix** e segue os padrões determinados em [bacen/pix-api](https://github.com/bacen/pix-api). Essa classe auxilia você criar um payload mais limpo, assim como receber os dados da **API Pix** de uma forma muito mais orgânica e organizada.
+
+Além dos métodos para obter/setar dados do `CobPayload`, haverão dois métodos disponíveis sendo eles:
+
+* `export()`: exporta todos os dados da classe `CobPayload` para o array compatível com a **API Pix**;
+* `import()`: importa todos os dados de resposta da **API Pix** para os objetos relacionados criando um `CobPayload` organizado.
+
+O `CobPayload` e as classes deviradas disponíveis em `Entities/Cob/*` são bem flexíveis e fazem a importação/exportação de todos os dados disponíveis conforme os modelos padrões da **API Pix**, não há muito com o que se preocupar.
+
+> Em breve, vamos criar uma documentação detalhada sobre essas classes.
+
+**Exemplo**
+
+```php
+// Não implementamos ainda uma classe $api
+$cobResponse = $api->getCob($tid);
+
+// Cria o cob para normalizar os dados
+$cob = (new CobPayload())->import($cobResponse);
+
+// Nome do recebedor do Pix
+$cob->getSender()->getName();
+// Nome do devedor do Pix
+$cob->getRecipient()->getName();
+// Valor original do Pix
+$cob->getAmount()->getOriginalAmount();
+// Status da cobrança do Pix
+$cob->getStatus();
+// -> exemplos de dados
+
+// Você também pode criar o seu cob e enviar via $api
+$devedor = (new Entities\Cob\Person())->setDocument('12345678930');
+$recebedor = (new Entities\Cob\Person())->setDocument('11222333000100');
+$valor = (new Entities\Cob\Amount())->setOriginalAmount('1.00');
+$calendario = (new Entities\Cob\Calendar())->setDueDate(DateTime::now()->add(new DateInterval('P10D')));
+
+$cob = (new CobPayload())
+	->setSender($recebedor)
+	->setRecipient($devedor)
+	->setAmount($valor)
+	->setCalendar($calendario);
+
+// Não implementamos ainda uma classe $api
+// Envie o payload do cob
+$cobResponse = $api->createCob($cob->export());
+
+// Capture a resposta
+$cob = (new CobPayload())->import($cobResponse);
+
+// E, depois pode convertê-lo para um payload:
+
+```
 
 ### Os atributos do Pix
 

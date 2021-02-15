@@ -3,6 +3,9 @@ namespace Piggly\Tests\Pix;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Piggly\Pix\Exceptions\EmvIdIsRequiredException;
+use Piggly\Pix\Exceptions\InvalidPixKeyException;
+use Piggly\Pix\Exceptions\InvalidPixKeyTypeException;
 use Piggly\Pix\Parser;
 use Piggly\Pix\Payload;
 
@@ -35,11 +38,10 @@ class PayloadTest extends TestCase
 				->setMerchantCity($this->pixData['merchantCity'])
 				->setAmount($this->pixData['amount'])
 				->setTid($this->pixData['tid'])
-				->setDescription($this->pixData['description'])
-				->setAsReusable($this->pixData['reusable']);
+				->setDescription($this->pixData['description']);
 
 		$this->assertSame(
-			'00020101021126850014br.gov.bcb.pix0136aae2196f-5f93-46e4-89e6-73bf4138427b0223Descrição do Pagamento!5204000053039865406109.905802BR5913Studio Piggly6007Uberaba62190515Boleto 00001-00630457CF',
+			'00020101021126850014br.gov.bcb.pix0136aae2196f-5f93-46e4-89e6-73bf4138427b0223Descrição do Pagamento!5204000053039865406109.905802BR5913Studio Piggly6007Uberaba62170513Boleto00001006304D7C7',
 			$pix->getPixCode()
 		);
 	}
@@ -54,11 +56,10 @@ class PayloadTest extends TestCase
 				->setMerchantCity($this->pixData['merchantCity'])
 				->setAmount($this->pixData['amount'])
 				->setTid($this->pixData['tid'])
-				->setDescription($this->pixData['description'])
-				->setAsReusable($this->pixData['reusable']);
+				->setDescription($this->pixData['description']);
 
 		$this->assertSame(
-			'data:image/png;base64,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',
+			'data:image/png;base64,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',
 			$pix->getQRCode(Payload::OUTPUT_PNG, Payload::ECC_L)
 		);
 	}
@@ -105,11 +106,10 @@ class PayloadTest extends TestCase
 			->setMerchantCity($this->pixData['merchantCity'])
 			->setAmount($this->pixData['amount'])
 			->setTid($this->pixData['tid'])
-			->setDescription($this->pixData['description'])
-			->setAsReusable($this->pixData['reusable']);
+			->setDescription($this->pixData['description']);
 
 		$this->assertSame(
-			'00020101021126840014br.gov.bcb.pix0136aae2196f-5f93-46e4-89e6-73bf4138427b0222Descricao do Pagamento5204000053039865406109.905802BR5913Studio Piggly6007Uberaba62190515Boleto 00001-006304BE1C',
+			'00020101021126840014br.gov.bcb.pix0136aae2196f-5f93-46e4-89e6-73bf4138427b0222Descricao do Pagamento5204000053039865406109.905802BR5913Studio Piggly6007Uberaba62170513Boleto00001006304FA8A',
 			$pix->getPixCode()
 		);
 	}
@@ -125,11 +125,10 @@ class PayloadTest extends TestCase
 			->setMerchantCity($this->pixData['merchantCity'])
 			->setAmount($this->pixData['amount'])
 			->setTid($this->pixData['tid'])
-			->setDescription($this->pixData['description'])
-			->setAsReusable($this->pixData['reusable']);
+			->setDescription($this->pixData['description']);
 
 		$this->assertSame(
-			'00020101021126850014br.gov.bcb.pix0136aae2196f-5f93-46e4-89e6-73bf4138427b0223DESCRIÇÃO DO PAGAMENTO!5204000053039865406109.905802BR5913STUDIO PIGGLY6007UBERABA62190515BOLETO 00001-006304E1DD',
+			'00020101021126850014br.gov.bcb.pix0136aae2196f-5f93-46e4-89e6-73bf4138427b0223DESCRIÇÃO DO PAGAMENTO!5204000053039865406109.905802BR5913STUDIO PIGGLY6007UBERABA62170513Boleto00001006304CF54',
 			$pix->getPixCode()
 		);
 	}
@@ -146,11 +145,10 @@ class PayloadTest extends TestCase
 			->setMerchantCity($this->pixData['merchantCity'])
 			->setAmount($this->pixData['amount'])
 			->setTid($this->pixData['tid'])
-			->setDescription($this->pixData['description'])
-			->setAsReusable($this->pixData['reusable']);
+			->setDescription($this->pixData['description']);
 
 		$this->assertSame(
-			'00020101021126840014br.gov.bcb.pix0136aae2196f-5f93-46e4-89e6-73bf4138427b0222DESCRICAO DO PAGAMENTO5204000053039865406109.905802BR5913STUDIO PIGGLY6007UBERABA62190515BOLETO 00001-006304C5E1',
+			'00020101021126840014br.gov.bcb.pix0136aae2196f-5f93-46e4-89e6-73bf4138427b0222DESCRICAO DO PAGAMENTO5204000053039865406109.905802BR5913STUDIO PIGGLY6007UBERABA62170513Boleto0000100630455C1',
 			$pix->getPixCode()
 		);
 	}
@@ -158,7 +156,7 @@ class PayloadTest extends TestCase
 	/** @test */
 	public function throwExceptionWhenPixKeyNotSet ()
 	{
-		$this->expectExceptionMessage('O id `01` não pode ser vazio.');
+		$this->expectException(EmvIdIsRequiredException::class);
 
 		(new Payload())
 			->setMerchantName($this->pixData['merchantName'])
@@ -169,7 +167,7 @@ class PayloadTest extends TestCase
 	/** @test */
 	public function throwExceptionWhenInvalidPixKey ()
 	{
-		$this->expectExceptionMessage('O valor `Chave Aleatória` para 0000 está inválido.');
+		$this->expectException(InvalidPixKeyException::class);
 
 		(new Payload())
 			->setPixKey($this->pixData['keyType'], '0000')
@@ -181,7 +179,7 @@ class PayloadTest extends TestCase
 	/** @test */
 	public function throwExceptionWhenPixMerchantNotSet ()
 	{
-		$this->expectExceptionMessage('O id `59` não pode ser vazio.');
+		$this->expectException(EmvIdIsRequiredException::class);
 
 		(new Payload())
 			->setPixKey($this->pixData['keyType'], $this->pixData['keyValue'])
