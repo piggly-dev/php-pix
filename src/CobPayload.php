@@ -1,6 +1,7 @@
 <?php
 namespace Piggly\Pix;
 
+use Piggly\Pix\Api\Interfaces\CobPayloadInterface;
 use Piggly\Pix\Entities\Cob\Amount;
 use Piggly\Pix\Entities\Cob\Calendar;
 use Piggly\Pix\Entities\Cob\Location;
@@ -16,7 +17,7 @@ use Piggly\Pix\Exceptions\InvalidCobFieldException;
  * @subpackage Piggly\Pix
  * @author     Caique <caique@piggly.com.br>
  */
-class CobPayload
+class CobPayload implements CobPayloadInterface
 {
 	/** @var string Cob status as "NAO_SETADO" . */
 	const STATUS_NAO_SETADO = 'NAO_SETADO';
@@ -370,6 +371,14 @@ class CobPayload
 	 */
 	public function getStatus () : string
 	{ return $this->status; }
+
+	/**
+	 * Get tid to current cob.
+	 * @since 1.2.1
+	 * @return string
+	 */
+	public function getTid () : string
+	{ return $this->tid; }
 
 	/**
 	 * Import data to this cob object based in the cob response array model.

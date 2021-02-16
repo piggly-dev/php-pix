@@ -134,6 +134,7 @@ class Reader
 	 * Will export EMVs to a payload object.
 	 * 
 	 * @since 1.2.0
+	 * @since 1.2.1 Get pix key type only when pix key exists.
 	 * @return Payload
 	 * @throws InvalidPixCodeException
 	 * @throws CannotParseKeyTypeException
@@ -153,7 +154,6 @@ class Reader
 			$merchantName = $this->getMerchantName();
 			$merchantCity = $this->getMerchantCity();
 			$pixKey       = $this->getPixKey();
-			$pixKeyType   = Parser::getKeyType($this->getPixKey());
 			$description  = $this->getDescription();
 			$amount       = $this->getAmount();
 			$tid          = $this->getTid();
@@ -165,7 +165,10 @@ class Reader
 			{ $payload->setMerchantCity($merchantCity); }
 
 			if ( !empty($pixKey) )
-			{ $payload->setPixKey($pixKeyType, $pixKey); }
+			{ 
+				$pixKeyType   = Parser::getKeyType($this->getPixKey());
+				$payload->setPixKey($pixKeyType, $pixKey); 
+			}
 
 			if ( !empty($description) )
 			{ $payload->setDescription($description); }
