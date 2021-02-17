@@ -18,6 +18,7 @@
     },
     "require": {
         "php": "^7.2",
+        "ext-gd": "*",
         "chillerlan/php-qrcode": "^3.3"
     },
     "require-dev": {
