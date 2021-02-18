@@ -7,6 +7,8 @@ use Exception;
 use Piggly\Pix\Exceptions\EmvIdIsRequiredException;
 use Piggly\Pix\Exceptions\InvalidEmvFieldException;
 use Piggly\Pix\Exceptions\InvalidPixKeyTypeException;
+use Piggly\Pix\Exceptions\QRCodeNotSupported;
+use Piggly\Pix\Exceptions\RequiredPhpExtension;
 use Piggly\Pix\Parser;
 
 /**
@@ -373,11 +375,16 @@ class Payload
 	 * @param string $imageType Type of output image.
 	 * @since 1.0.0
 	 * @since 1.0.2 Added support for output image.
+	 * @since 1.2.2 Check if PHP supports QR Codes image.
 	 * @return string
 	 * @throws Exception When something went wrong.
+	 * @throws QRCodeNotSupported QR Code is not supported.
 	 */
 	public function getQRCode ( string $imageType = self::OUTPUT_SVG, int $ecc = self::ECC_M ) : string
 	{ 
+		if ( !self::supportQrCode() )
+		{ throw new QRCodeNotSupported(); }
+
 		$options = new QROptions([
 			'outputLevel' => $ecc,
 			'outputType' => $imageType
@@ -694,4 +701,13 @@ class Payload
 
 		return $value;
 	}
+
+	/**
+	 * Return if php supports QR Code.
+	 * 
+	 * @since 1.2.2
+	 * @return bool
+	 */
+	public static function supportQrCode () : bool
+	{ return ((float)phpversion('Core') >= 7.2) && (extension_loaded('gd') && function_exists('gd_info')); }
 }

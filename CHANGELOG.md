@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2
+
+* A exceção `QRCodeNotSupported` foi criada para impedir a criação do QR Code se a versão do PHP for inferior a 7.2 e a extensão `gd` não estiver instalada.
+
 ## 1.2.1
 
 * A base de comunicação com as **Apis Pix**, agora você poderá utilizar nossa estrutura para melhorar seu processo de comunicação com qualquer Api Pix. Veja mais detalhes [aqui](https://github.com/piggly-dev/php-pix/wiki);
