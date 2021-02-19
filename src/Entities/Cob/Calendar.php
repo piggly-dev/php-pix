@@ -55,7 +55,7 @@ class Calendar
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setCreatedAt ( $createdAt ) : self
+	public function setCreatedAt ( $createdAt )
 	{
 		if ( !($createdAt instanceof DateTime))
 		{ $this->createdAt = new DateTime($createdAt); }
@@ -72,7 +72,7 @@ class Calendar
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setPresentedAt ( $presentedAt ) : self
+	public function setPresentedAt ( $presentedAt )
 	{
 		if ( !($presentedAt instanceof DateTime))
 		{ $this->presentedAt = new DateTime($presentedAt); }
@@ -102,7 +102,7 @@ class Calendar
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setDueDate ( $dueDate ) : self
+	public function setDueDate ( $dueDate )
 	{
 		if ( !($dueDate instanceof DateTime))
 		{ $this->dueDate = new DateTime($dueDate); }

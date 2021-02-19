@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.3
+
+* Remoção do tipo de retorno `: self` habilitando funcionalidade para PHP 7+, entretanto, para QR Code permanece 7.2+.
+
 ## 1.2.2
 
 * A exceção `QRCodeNotSupported` foi criada para impedir a criação do QR Code se a versão do PHP for inferior a 7.2 e a extensão `gd` não estiver instalada.

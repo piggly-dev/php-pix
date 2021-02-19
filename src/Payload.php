@@ -158,7 +158,7 @@ class Payload
 	 * @return self
 	 * @deprecated Aplica-se apenas as versões Pix anteriores a 2.
 	 */
-	public function applyEmailWhitespace ( bool $apply = true ) : self
+	public function applyEmailWhitespace ( bool $apply = true )
 	{ $this->emailWhitespace = $apply; return $this; }
 
 	/**
@@ -168,7 +168,7 @@ class Payload
 	 * @since 1.1.0
 	 * @return self
 	 */
-	public function applyValidCharacters ( bool $apply = true ) : self
+	public function applyValidCharacters ( bool $apply = true )
 	{ $this->validCharacters = $apply; return $this; }
 
 	/**
@@ -178,7 +178,7 @@ class Payload
 	 * @since 1.1.0
 	 * @return self
 	 */
-	public function applyUppercase ( bool $apply = true ) : self
+	public function applyUppercase ( bool $apply = true )
 	{ $this->upper = $apply; return $this; }
 
 	/**
@@ -194,7 +194,7 @@ class Payload
 	 * @throws InvalidPixKeyTypeException When pix key type is invalid.
 	 * @throws InvalidPixKeyException When pix key is invalid base in key type.
 	 */
-	public function setPixKey ( string $keyType, string $pixKey ) : self
+	public function setPixKey ( string $keyType, string $pixKey )
 	{
 		// Validate Key
 		Parser::validate($keyType, $pixKey);
@@ -233,7 +233,7 @@ class Payload
 	 * @since 1.2.0 Max size limit increased to 40 chars.
 	 * @return self
 	 */
-	public function setDescription ( string $description ) : self
+	public function setDescription ( string $description )
 	{ 
 		$this->description = $this->applyLength('Description', $this->replacesChar( $this->uppercase( $description ) ), 40); 
 		return $this; 
@@ -251,7 +251,7 @@ class Payload
 	 * @since 1.0.3 Removed applyLength function.
 	 * @return self
 	 */
-	public function setMerchantName ( string $merchantName ) : self
+	public function setMerchantName ( string $merchantName )
 	{ 
 		$this->merchantName = $this->replacesChar( $this->uppercase( $merchantName ) ); 
 		return $this; 
@@ -269,7 +269,7 @@ class Payload
 	 * @since 1.0.3 Removed applyLength function.
 	 * @return self
 	 */
-	public function setMerchantCity ( string $merchantCity ) : self
+	public function setMerchantCity ( string $merchantCity )
 	{ 
 		$this->merchantCity = $this->replacesChar( $this->uppercase( $merchantCity ) ); 
 		return $this; 
@@ -293,7 +293,7 @@ class Payload
 	 * @since 1.2.0 Generate a random string when $tid is null.
 	 * @return self
 	 */
-	public function setTid ( ?string $tid ) : self
+	public function setTid ( ?string $tid )
 	{ 
 		if ( is_null( $tid ) )
 		{ $this->tid = Parser::getRandom(); }
@@ -326,7 +326,7 @@ class Payload
 	 * @return self
 	 * @throws InvalidEmvFieldException When amount is greater than max length.
 	 */
-	public function setAmount ( float $amount ) : self
+	public function setAmount ( float $amount )
 	{ $this->amount = $this->applyLength('Amount', (string) number_format( $amount, 2, '.', '' ), 13, true); return $this; }
 
 	/**
@@ -339,7 +339,7 @@ class Payload
 	 * @since 1.2.0 not change $reusable variable anymore
 	 * @return self
 	 */
-	public function setAsReusable ( bool $reusable = true ) : self
+	public function setAsReusable ( bool $reusable = true )
 	{ $this->reusable = $reusable; return $this; }
 
 	/**

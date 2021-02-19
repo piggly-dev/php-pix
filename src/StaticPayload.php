@@ -28,6 +28,6 @@ class StaticPayload extends Payload
 	 * @since 1.2.0 Will be ignored
 	 * @return self
 	 */
-	public function setAsReusable ( bool $reusable = true ) : self
+	public function setAsReusable ( bool $reusable = true )
 	{ $this->reusable = true; return $this; }
 }

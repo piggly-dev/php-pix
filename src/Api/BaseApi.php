@@ -142,7 +142,7 @@ abstract class BaseApi
 	 * @since 1.2.1
 	 * @return self
 	 */
-	public static function use ( string $baseUrl = null, string $sslCert = null, string $sslPass = null ) : self
+	public static function use ( string $baseUrl = null, string $sslCert = null, string $sslPass = null )
 	{
 		if ( !isset( self::$instance ) )
 		{ 
@@ -260,7 +260,7 @@ abstract class BaseApi
 	 * @return self
 	 * @throws InvalidApiUriParameter if endpoint does not contain an uri parameter required.
 	 */
-	public function addEndpoint ( int $endpoint, string $method, string $uri ) : self
+	public function addEndpoint ( int $endpoint, string $method, string $uri )
 	{
 		$this->validateUriParams($endpoint, $uri);
 		$this->endPoints[$endpoint] = [

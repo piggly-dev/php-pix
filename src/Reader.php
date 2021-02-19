@@ -62,7 +62,7 @@ class Reader
 	 * @return self
 	 * @throws InvalidPixCodeException When pix code is invalid.
 	 */
-	public function extract ( string $pixCode ) : self
+	public function extract ( string $pixCode )
 	{
 		if ( !$this->isValidCode($pixCode) )
 		{ throw new InvalidPixCodeException($pixCode); }

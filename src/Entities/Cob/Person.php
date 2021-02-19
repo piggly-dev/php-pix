@@ -106,7 +106,7 @@ class Person
 	 * @return self
 	 * @throws InvalidFieldException When document is not a valid CPF/CNPJ.
 	 */
-	public function setDocument ( string $document ) : self
+	public function setDocument ( string $document )
 	{
 		if ( Parser::validateCpf($document) )
 		{ 
@@ -131,7 +131,7 @@ class Person
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setName ( string $name ) : self
+	public function setName ( string $name )
 	{
 		$this->name = $name;
 		return $this;
@@ -144,7 +144,7 @@ class Person
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setFantasyName ( string $fantasyName ) : self
+	public function setFantasyName ( string $fantasyName )
 	{
 		$this->fantasyName = $fantasyName;
 		return $this;
@@ -157,7 +157,7 @@ class Person
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setStreetAddress ( string $streetAddress ) : self
+	public function setStreetAddress ( string $streetAddress )
 	{
 		$this->streetAddress = $streetAddress;
 		return $this;
@@ -170,7 +170,7 @@ class Person
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setCity ( string $city ) : self
+	public function setCity ( string $city )
 	{
 		$this->city = $city;
 		return $this;
@@ -183,7 +183,7 @@ class Person
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setState ( string $state ) : self
+	public function setState ( string $state )
 	{
 		if ( strlen($state) > 2 )
 		{ throw new InvalidFieldException('UF', $state, 'O estado precisa ser identificado com apenas duas letras.'); }
@@ -199,7 +199,7 @@ class Person
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setZipCode ( string $zipcode ) : self
+	public function setZipCode ( string $zipcode )
 	{
 		if ( strlen($zipcode) > 2 )
 		{ throw new InvalidFieldException('UF', $zipcode, 'O estado precisa ser identificado com apenas duas letras.'); }

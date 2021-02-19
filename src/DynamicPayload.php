@@ -34,7 +34,7 @@ class DynamicPayload extends Payload
 	 * @param string $url
 	 * @return self
 	 */
-	public function setPayloadUrl ( string $url ) : self
+	public function setPayloadUrl ( string $url )
 	{
 		$url = \preg_replace('/(http[s]?)(\:\/\/)?/', '', $url);
 		$this->payloadUrl = $url;
@@ -49,7 +49,7 @@ class DynamicPayload extends Payload
 	 * @since 1.2.0 Will be ignored
 	 * @return self
 	 */
-	public function setPixKey ( string $keyType, string $pixKey ) : self
+	public function setPixKey ( string $keyType, string $pixKey )
 	{ return $this; }
 
 	/**
@@ -59,7 +59,7 @@ class DynamicPayload extends Payload
 	 * @since 1.2.0 Will be ignored
 	 * @return self
 	 */
-	public function setDescription ( string $description ) : self
+	public function setDescription ( string $description )
 	{ return $this; }
 
 	/**
@@ -69,7 +69,7 @@ class DynamicPayload extends Payload
 	 * @since 1.2.0 Will be ignored
 	 * @return self
 	 */
-	public function setAsReusable ( bool $reusable = true ) : self
+	public function setAsReusable ( bool $reusable = true )
 	{ $this->reusable = false; return $this; }
 
 	/**

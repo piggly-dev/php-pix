@@ -121,7 +121,7 @@ class CobPayload implements CobPayloadInterface
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setSender ( Person $person ) : self
+	public function setSender ( Person $person )
 	{
 		$this->sender = $person;
 		return $this;
@@ -134,7 +134,7 @@ class CobPayload implements CobPayloadInterface
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setRecipient ( Person $person ) : self
+	public function setRecipient ( Person $person )
 	{
 		$this->recipient = $person;
 		return $this;
@@ -147,7 +147,7 @@ class CobPayload implements CobPayloadInterface
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setCalendar ( Calendar $calendar ) : self
+	public function setCalendar ( Calendar $calendar )
 	{
 		$this->calendar = $calendar;
 		return $this;
@@ -160,7 +160,7 @@ class CobPayload implements CobPayloadInterface
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setAmount ( Amount $amount ) : self
+	public function setAmount ( Amount $amount )
 	{
 		$this->amount = $amount;
 		return $this;
@@ -173,7 +173,7 @@ class CobPayload implements CobPayloadInterface
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setLocation ( Location $location ) : self
+	public function setLocation ( Location $location )
 	{
 		$this->location = $location;
 		return $this;
@@ -187,7 +187,7 @@ class CobPayload implements CobPayloadInterface
 	 * @return self
 	 * @throws CannotParseKeyTypeException Cannot parse type of pix key, may be invalid.
 	 */
-	public function setPixKey ( string $pixKey ) : self
+	public function setPixKey ( string $pixKey )
 	{
 		$this->pixKeyType = Parser::getKeyType($pixKey);
 		$this->pixKey = $pixKey;
@@ -201,7 +201,7 @@ class CobPayload implements CobPayloadInterface
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setTid ( string $tid ) : self
+	public function setTid ( string $tid )
 	{
 		$this->tid = $tid;
 		return $this;
@@ -214,7 +214,7 @@ class CobPayload implements CobPayloadInterface
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setRequestToRecipient ( string $requestToRecipient ) : self
+	public function setRequestToRecipient ( string $requestToRecipient )
 	{
 		$this->requestToRecipient = $requestToRecipient;
 		return $this;
@@ -243,7 +243,7 @@ class CobPayload implements CobPayloadInterface
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setRevision ( int $revision ) : self
+	public function setRevision ( int $revision )
 	{
 		$this->revision = $revision;
 		return $this;
@@ -256,7 +256,7 @@ class CobPayload implements CobPayloadInterface
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setStatus ( string $status ) : self
+	public function setStatus ( string $status )
 	{
 		switch ( $status )
 		{
@@ -387,7 +387,7 @@ class CobPayload implements CobPayloadInterface
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function import ( array $response ) : self
+	public function import ( array $response )
 	{
 		if ( isset($response['txid']) )
 		{ $this->setTid($response['txid']); }

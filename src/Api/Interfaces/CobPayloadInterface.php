@@ -25,7 +25,7 @@ interface CobPayloadInterface
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function import ( array $response ) : self;
+	public function import ( array $response );
 
 	/**
 	 * Export current payload data to an valid array.

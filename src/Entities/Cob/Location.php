@@ -46,7 +46,7 @@ class Location
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setId ( int $id ) : self
+	public function setId ( int $id )
 	{
 		$this->id = $id;
 		return $this;
@@ -59,7 +59,7 @@ class Location
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setLocation ( string $location ) : self
+	public function setLocation ( string $location )
 	{
 		$this->location = $location;
 		return $this;
@@ -72,7 +72,7 @@ class Location
 	 * @since 1.2.0
 	 * @return self
 	 */
-	public function setType ( string $type ) : self
+	public function setType ( string $type )
 	{
 		switch ( $type )
 		{
