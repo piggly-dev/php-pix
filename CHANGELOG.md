@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.4
+
+* Adição do método `ignorePointOfInitiationMethod()` para não retornar o **Point of Initiation Method** do código Pix criado;
+* Adição do parâmetro `$applyMaxLength` nos métodos `setDescription()`, `setMerchantName()` e `setMerchantCity()` que cortará os valores respeitando os limites de `40`, `25` e `15` caracteres respectivamente. O valor padrão do `$applyMaxLength` é `true` para `setDescription()` e `false` para `setMerchantName()` e `setMerchantCity()`;
+* Adição do método `getField()` na classe `Reader` para obter qualquer campo EMV a partir do seu ID. O método `$additionalDataField = $reader->getField('62')` retorna o EMV com ID `62`, para obter os campos dentro desse EMV basta enviá-lo e obter o ID desejado `$tid = $reader->getField('05', $additionalDataField)`.
+
 ## 1.2.3
 
 * Remoção do tipo de retorno `: self` habilitando funcionalidade para PHP 7+, entretanto, para QR Code permanece 7.2+.

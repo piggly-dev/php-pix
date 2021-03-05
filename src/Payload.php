@@ -150,6 +150,13 @@ class Payload
 	protected $upper = false;
 
 	/**
+	 * Ignore the point of initiation method.
+	 * @since 1.1.0
+	 * @var boolean
+	 */
+	protected $ignorePoIM = false;
+
+	/**
 	 * Replaces the @ character in e-mail key to a space.
 	 * 
 	 * @param bool $apply
@@ -180,6 +187,16 @@ class Payload
 	 */
 	public function applyUppercase ( bool $apply = true )
 	{ $this->upper = $apply; return $this; }
+
+	/**
+	 * Ignore point of initiation method.
+	 * 
+	 * @param bool $apply
+	 * @since 1.2.4
+	 * @return self
+	 */
+	public function ignorePointOfInitiationMethod ( bool $apply = true )
+	{ $this->ignorePoIM = $apply; return $this; }
 
 	/**
 	 * Set the current pix key.
@@ -229,13 +246,16 @@ class Payload
 	 * That's why we choose 40 chars as max length size.
 	 * 
 	 * @param string $description Pix description.
+	 * @param bool $applyMaxLength Apply max length to field. Apply by default.
 	 * @since 1.0.0
 	 * @since 1.2.0 Max size limit increased to 40 chars.
+	 * @since 1.2.4 Apply max length to field. Continue to apply by default.
 	 * @return self
 	 */
-	public function setDescription ( string $description )
+	public function setDescription ( string $description, bool $applyMaxLength = true )
 	{ 
-		$this->description = $this->applyLength('Description', $this->replacesChar( $this->uppercase( $description ) ), 40); 
+		$description = $applyMaxLength ? $this->applyLength('Description', $description, 40) : $description;
+		$this->description = $this->replacesChar( $this->uppercase( $description ) ); 
 		return $this; 
 	}
 
@@ -246,13 +266,16 @@ class Payload
 	 * Max length 25
 	 * 
 	 * @param string $merchantName Pix merchant name.
+	 * @param bool $applyMaxLength Apply max length to field.
 	 * @since 1.0.0
 	 * @since 1.0.2 Removed character limit.
 	 * @since 1.0.3 Removed applyLength function.
+	 * @since 1.2.4 Apply max length to field.
 	 * @return self
 	 */
-	public function setMerchantName ( string $merchantName )
+	public function setMerchantName ( string $merchantName, bool $applyMaxLength = false )
 	{ 
+		$merchantName = $applyMaxLength ? $this->applyLength('Merchant Name', $merchantName, 25) : $merchantName;
 		$this->merchantName = $this->replacesChar( $this->uppercase( $merchantName ) ); 
 		return $this; 
 	}
@@ -264,13 +287,16 @@ class Payload
 	 * Max length 15
 	 * 
 	 * @param string $merchantCity Pix merchant city.
+	 * @param bool $applyMaxLength Apply max length to field.
 	 * @since 1.0.0
 	 * @since 1.0.2 Removed character limit.
 	 * @since 1.0.3 Removed applyLength function.
+	 * @since 1.2.4 Apply max length to field.
 	 * @return self
 	 */
-	public function setMerchantCity ( string $merchantCity )
+	public function setMerchantCity ( string $merchantCity, bool $applyMaxLength = false  )
 	{ 
+		$merchantCity = $applyMaxLength ? $this->applyLength('Merchant City', $merchantCity, 15) : $merchantCity;
 		$this->merchantCity = $this->replacesChar( $this->uppercase( $merchantCity ) ); 
 		return $this; 
 	}
@@ -413,10 +439,14 @@ class Payload
 	 * EMV -> ID 01
 	 * 
 	 * @since 1.0.0
+	 * @since 1.2.4 Point of initiation method can be ignored.
 	 * @return string
 	 */
 	protected function getPointOfInitiationMethod ()
 	{
+		if ( $this->ignorePoIM )
+		{ return ''; }
+
 		return 
 			$this->reusable ?
 				// Reusable

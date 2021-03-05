@@ -203,6 +203,27 @@ class Reader
 	}
 
 	/**
+	 * Get a EMV field by your ID.
+	 * 
+	 * @param string $id
+	 * @param array $emvs Default is $this->emvs
+	 * @since 1.2.4
+	 * @return array|null
+	 */
+	public function getField ( string $id, ?array $emvs = null ) : ?array
+	{
+		if ( !empty($emvs) && !isset($emvs['value']) )
+		{ return null; }
+
+		$emv = empty($emvs) ? $this->findEMV( $id ) : $this->findEMV( $id, $emvs['value'] );
+
+		if ( !empty( $emv ) )
+		{ return $emv; }
+
+		return null;
+	}
+
+	/**
 	 * Get current point of initiation
 	 * 
 	 * @since 1.1.0
