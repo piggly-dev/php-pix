@@ -726,7 +726,7 @@ class Payload
 			if ( $throws )
 			{ throw new InvalidEmvFieldException($emvField, $value, sprintf('Excede o limite de %s caracteres.', $maxLength)); }
 
-			return substr($value, 0, 25);
+			return substr($value, 0, $maxLength);
 		}
 
 		return $value;

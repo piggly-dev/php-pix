@@ -59,7 +59,7 @@ class DynamicPayload extends Payload
 	 * @since 1.2.0 Will be ignored
 	 * @return self
 	 */
-	public function setDescription ( string $description )
+	public function setDescription ( string $description, bool $applyMaxLength = true )
 	{ return $this; }
 
 	/**

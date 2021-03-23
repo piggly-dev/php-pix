@@ -186,4 +186,21 @@ class PayloadTest extends TestCase
 			->setMerchantCity($this->pixData['merchantCity'])
 			->getPixCode();
 	}
+
+	/** @test */
+	public function applyMaxLength()
+	{
+		$pix = (new Payload())
+			->setPixKey($this->pixData['keyType'], $this->pixData['keyValue'])
+			->setMerchantName('AAAAAAAAAAAAAAAAAAAAAAAAAB', true) // 26 caracteres, maximo 25
+			->setMerchantCity('AAAAAAAAAAAAAAAB', true) // 16 caracteres, maximo 15
+			->setAmount($this->pixData['amount'])
+			->setTid($this->pixData['tid'])
+			->setDescription('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB', true); // 41 caracteres, maximo 40
+
+		$this->assertSame(
+			'000201010211261020014br.gov.bcb.pix0136aae2196f-5f93-46e4-89e6-73bf4138427b0240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5204000053039865406109.905802BR5925AAAAAAAAAAAAAAAAAAAAAAAAA6015AAAAAAAAAAAAAAA62170513Boleto00001006304516D',
+			$pix->getPixCode()
+		);
+	}
 }
