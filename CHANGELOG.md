@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.5
+
+* Correção de bugs.
+
 ## 1.2.4
 
 * Adição do método `ignorePointOfInitiationMethod()` para não retornar o **Point of Initiation Method** do código Pix criado;
