@@ -293,12 +293,13 @@ class Parser
 	 * Parse transaction id string to valid characters.
 	 * 
 	 * @since 1.1.2
+	 * @since 1.2.6 Return *** when $tid is equal to ***.
 	 * @param string $phone
 	 * @return string
 	 */
 	public static function parseTid ( string $tid = null )
 	{
-		if ( empty($tid) )
+		if ( empty($tid) || $tid === '***' )
 		{ return '***'; }
 
 		return preg_replace('/[^A-Za-z0-9]+/', '', $tid);

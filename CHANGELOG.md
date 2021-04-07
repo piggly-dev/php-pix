@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.6
+
+* Correção do método `Parser::parseTid` para receber o valor `***`.
+
 ## 1.2.5
 
 * Correção de bugs.
