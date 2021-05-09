@@ -73,7 +73,7 @@ class Reader
 
 		while ( !empty($this->pixCode) )
 		{
-			$currId = $this->getData(2, $this->pixCode);
+			$currId = $this->getData($this->pixCode, 2);
 			$this->emvs[] = $this->getEMV($currId, $this->pixCode);
 
 			switch ( $currId )
@@ -105,7 +105,7 @@ class Reader
 
 		while ( !empty( $value ) )
 		{
-			$currId = $this->getData(2, $value);
+			$currId = $this->getData($value, 2);
 			$data[] = $this->getEMV($currId, $value);
 		}
 		
@@ -382,12 +382,12 @@ class Reader
 	 */
 	protected function getEMV ( $id, &$code ) : array 
 	{
-		$size = $this->getData(2, $code);
+		$size = $this->getData($code, 2);
 
 		return [
 			'id' => $id,
 			'size' => $size,
-			'value' => $this->getData( intval($size), $code )
+			'value' => $this->getData($code , intval($size))
 		];
 	}
 
@@ -398,7 +398,7 @@ class Reader
 	 * @since 1.1.0
 	 * @return string
 	 */
-	protected function getData ( int $size = 2, &$code ) : string
+	protected function getData ( &$code, int $size = 2 ) : string
 	{ 
 		// Extract string till $size position
 		$extracted = mb_substr($code, 0, $size);

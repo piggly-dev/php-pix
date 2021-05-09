@@ -13,7 +13,7 @@ class ReaderTest extends TestCase
 	/** @var string Nubank Pix code. */
 	protected $nuBank;
 
-	protected function setUp () 
+	protected function setUp () : void
 	{
 		$this->nuBank = '00020126770014BR.GOV.BCB.PIX0136aae2196f-5f93-46e4-89e6-73bf4138427b0215Descrição Teste52040000530398654041.005802BR5922Caique Monteiro Araujo6009SAO PAULO61080540900062160512NUR1pycKbhb063046BF7';
 	}

@@ -14,7 +14,7 @@ class PayloadTest extends TestCase
 	/** @var array Pix data. */
 	protected $pixData;
 
-	protected function setUp () 
+	protected function setUp () : void
 	{
 		$this->pixData = [
 			'keyType'  => Parser::KEY_TYPE_RANDOM,
@@ -74,7 +74,7 @@ class PayloadTest extends TestCase
 				->setMerchantCity($this->pixData['merchantCity']);
 
 		$this->assertSame(
-			'00020101021126580014br.gov.bcb.pix0136aae2196f-5f93-46e4-89e6-73bf4138427b5204000053039865802BR5913Studio Piggly6007Uberaba63048967',
+			'00020101021126580014br.gov.bcb.pix0136aae2196f-5f93-46e4-89e6-73bf4138427b5204000053039865802BR5913Studio Piggly6007Uberaba62070503***6304B416',
 			$pix->getPixCode()
 		);
 	}
@@ -90,7 +90,7 @@ class PayloadTest extends TestCase
 				->setMerchantCity($this->pixData['merchantCity']);
 
 		$this->assertSame(
-			'00020101021126420014br.gov.bcb.pix0120caique piggly.com.br5204000053039865802BR5913Studio Piggly6007Uberaba6304BB89',
+			'00020101021126420014br.gov.bcb.pix0120caique piggly.com.br5204000053039865802BR5913Studio Piggly6007Uberaba62070503***63047D35',
 			$pix->getPixCode()
 		);
 	}

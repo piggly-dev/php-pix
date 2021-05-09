@@ -17,12 +17,12 @@
         }
     },
     "require": {
-        "php": "^7.2|^8.0",
+        "php": "^7.2 || ^8.0",
         "ext-gd": "*",
-        "chillerlan/php-qrcode": "^3.3"
+        "chillerlan/php-qrcode": "^4.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.4"
+        "phpunit/phpunit": "^9.5"
     },
     "scripts": {
         "test": "phpunit"
