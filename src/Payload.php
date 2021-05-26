@@ -271,12 +271,13 @@ class Payload
 	 * @since 1.0.2 Removed character limit.
 	 * @since 1.0.3 Removed applyLength function.
 	 * @since 1.2.4 Apply max length to field.
+	 * @since 1.2.7 Cannot allow digits as 0-9.
 	 * @return self
 	 */
 	public function setMerchantName ( string $merchantName, bool $applyMaxLength = false )
 	{ 
 		$merchantName = $applyMaxLength ? $this->applyLength('Merchant Name', $merchantName, 25) : $merchantName;
-		$this->merchantName = $this->replacesChar( $this->uppercase( $merchantName ) ); 
+		$this->merchantName = $this->replacesChar( $this->uppercase( $merchantName ), false ); 
 		return $this; 
 	}
 
@@ -292,12 +293,13 @@ class Payload
 	 * @since 1.0.2 Removed character limit.
 	 * @since 1.0.3 Removed applyLength function.
 	 * @since 1.2.4 Apply max length to field.
+	 * @since 1.2.7 Cannot allow digits as 0-9.
 	 * @return self
 	 */
 	public function setMerchantCity ( string $merchantCity, bool $applyMaxLength = false  )
 	{ 
 		$merchantCity = $applyMaxLength ? $this->applyLength('Merchant City', $merchantCity, 15) : $merchantCity;
-		$this->merchantCity = $this->replacesChar( $this->uppercase( $merchantCity ) ); 
+		$this->merchantCity = $this->replacesChar( $this->uppercase( $merchantCity ), false ); 
 		return $this; 
 	}
 
@@ -691,10 +693,12 @@ class Payload
 	 * Replaces any invalid character to a valid one.
 	 * 
 	 * @since 1.1.0
+	 * @since 1.2.7 Allow to remove or include digits.
 	 * @param string $str
+	 * @param bool $allowDigits If allow digits 0-9
 	 * @return string
 	 */
-	private function replacesChar ( string $str ) : string
+	private function replacesChar ( string $str, bool $allowDigits = true ) : string
 	{
 		if ( !$this->validCharacters )
 		{ return $str; }
@@ -702,7 +706,7 @@ class Payload
 		$invalid = array("Á", "À", "Â", "Ä", "Ă", "Ā", "Ã", "Å", "Ą", "Æ", "Ć", "Ċ", "Ĉ", "Č", "Ç", "Ď", "Đ", "Ð", "É", "È", "Ė", "Ê", "Ë", "Ě", "Ē", "Ę", "Ə", "Ġ", "Ĝ", "Ğ", "Ģ", "á", "à", "â", "ä", "ă", "ā", "ã", "å", "ą", "æ", "ć", "ċ", "ĉ", "č", "ç", "ď", "đ", "ð", "é", "è", "ė", "ê", "ë", "ě", "ē", "ę", "ə", "ġ", "ĝ", "ğ", "ģ", "Ĥ", "Ħ", "Í", "Ì", "İ", "Î", "Ï", "Ī", "Į", "Ĳ", "Ĵ", "Ķ", "Ļ", "Ł", "Ń", "Ň", "Ñ", "Ņ", "Ó", "Ò", "Ô", "Ö", "Õ", "Ő", "Ø", "Ơ", "Œ", "ĥ", "ħ", "ı", "í", "ì", "î", "ï", "ī", "į", "ĳ", "ĵ", "ķ", "ļ", "ł", "ń", "ň", "ñ", "ņ", "ó", "ò", "ô", "ö", "õ", "ő", "ø", "ơ", "œ", "Ŕ", "Ř", "Ś", "Ŝ", "Š", "Ş", "Ť", "Ţ", "Þ", "Ú", "Ù", "Û", "Ü", "Ŭ", "Ū", "Ů", "Ų", "Ű", "Ư", "Ŵ", "Ý", "Ŷ", "Ÿ", "Ź", "Ż", "Ž", "ŕ", "ř", "ś", "ŝ", "š", "ş", "ß", "ť", "ţ", "þ", "ú", "ù", "û", "ü", "ŭ", "ū", "ů", "ų", "ű", "ư", "ŵ", "ý", "ŷ", "ÿ", "ź", "ż", "ž");
 		$valid   = array("A", "A", "A", "A", "A", "A", "A", "A", "A", "AE", "C", "C", "C", "C", "C", "D", "D", "D", "E", "E", "E", "E", "E", "E", "E", "E", "G", "G", "G", "G", "G", "a", "a", "a", "a", "a", "a", "a", "a", "a", "ae", "c", "c", "c", "c", "c", "d", "d", "d", "e", "e", "e", "e", "e", "e", "e", "e", "g", "g", "g", "g", "g", "H", "H", "I", "I", "I", "I", "I", "I", "I", "IJ", "J", "K", "L", "L", "N", "N", "N", "N", "O", "O", "O", "O", "O", "O", "O", "O", "CE", "h", "h", "i", "i", "i", "i", "i", "i", "i", "ij", "j", "k", "l", "l", "n", "n", "n", "n", "o", "o", "o", "o", "o", "o", "o", "o", "o", "R", "R", "S", "S", "S", "S", "T", "T", "T", "U", "U", "U", "U", "U", "U", "U", "U", "U", "U", "W", "Y", "Y", "Y", "Z", "Z", "Z", "r", "r", "s", "s", "s", "s", "B", "t", "t", "b", "u", "u", "u", "u", "u", "u", "u", "u", "u", "u", "w", "y", "y", "y", "z", "z", "z");
 		$str     = str_ireplace( $invalid, $valid, $str );
-		$str     = preg_replace('/[\!\.\,\@\#\$\%\&\*\(\)\/\*\?]+/', '', $str);
+		$str     = $allowDigits ? preg_replace('/[^A-Za-z0-9\-\s]+/', '', $str) : preg_replace('/[^A-Za-z\s]+/', '', $str);
 
 		return $str;
 	}
