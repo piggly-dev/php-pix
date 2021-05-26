@@ -227,14 +227,14 @@ class Parser
 	 * 
 	 * @since 1.0.0
 	 * @since 1.2.0 Custom exception error
-	 * @param string $key Pix key.
-	 * @param string $value Pix value.
+	 * @param string $keyType Pix key type.
+	 * @param string $value Pix key value.
 	 * @return string
 	 * @throws InvalidPixKeyTypeException pix key type is invalid
 	 */
-	public static function parse ( string $key, string $value ) : string
+	public static function parse ( string $keyType, string $value ) : string
 	{
-		switch ( $key )
+		switch ( $keyType )
 		{
 			case self::KEY_TYPE_RANDOM:
 				return $value;
@@ -246,7 +246,7 @@ class Parser
 				return self::parsePhone($value);
 		}
 
-		throw new InvalidPixKeyTypeException($key);
+		throw new InvalidPixKeyTypeException($keyType);
 	}
 
 	/**
@@ -308,8 +308,10 @@ class Parser
 	/**
 	 * Return the key type based in the pix key.
 	 * 
+	 * @todo Some phone may be caught as document.
 	 * @since 1.1.0
 	 * @since 1.2.0 Custom exception error.
+	 * @since 1.2.7 Fixed bug with some DOCUMENT/PHONE detection.
 	 * @param string $pixKey
 	 * @return string
 	 * @throws CannotParseKeyTypeException Cannot parse type of pix key
@@ -324,8 +326,15 @@ class Parser
 		if ( self::validateEmail($pixKey) )
 		{ return self::KEY_TYPE_EMAIL; }
 
+		// Must be a phone
+		if ( \strpos($pixKey, '+') !== false || \strpos($pixKey, '(') !== false )
+		{
+			if ( self::validatePhone($pixKey) )
+			{ return self::KEY_TYPE_PHONE; }
+		}
+
 		// Valid CPF or CNPJ
-		if ( self::validateCpf($pixKey) || self::validateCnpj($pixKey) )
+		if ( self::validateDocument($pixKey) )
 		{ return self::KEY_TYPE_DOCUMENT; }
 
 		// Any type of phone

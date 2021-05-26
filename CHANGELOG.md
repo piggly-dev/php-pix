@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.7
+
+* Correções no método `Parser::getKeyType()` e no método `Payload::replacesChar()`.
+* Atualizações dos testes.
+
 ## 1.2.6
 
 * Correção do método `Parser::parseTid` para receber o valor `***`.

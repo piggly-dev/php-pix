@@ -9,7 +9,7 @@ class CobPayloadTest extends TestCase
 	/** @var array Cob Data. */
 	protected $cobData;
 
-	protected function setUp () 
+	protected function setUp () : void
 	{
 		$this->cobData = [
 			"calendario" => [
