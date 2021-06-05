@@ -105,7 +105,7 @@ class MultiField extends AbstractField
 	{ 
 		$id = \intval($field->getId());
 
-		if ( $id < $this->mixId || $id > $this->maxId )
+		if ( $id < $this->minId || $id > $this->maxId )
 		{ throw new InvalidEmvFieldException($this->name, $field->getId(), \sprintf('O ID não está dento do limite `%s` até `%s` aceito pelo campo.', $this->minId, $this->maxId)); }
 
 		$this->fields[$field->getId()] = $field; return $this; 

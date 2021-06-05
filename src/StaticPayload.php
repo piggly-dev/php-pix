@@ -1,6 +1,7 @@
 <?php
 namespace Piggly\Pix;
 
+use Piggly\Pix\Emv\MPM;
 use Piggly\Pix\Utils\Cast;
 
 /**
@@ -33,6 +34,26 @@ class StaticPayload extends AbstractPayload
 		$this->mpm->getEmv('26')->removeField('25');
 		// Set default Reference Label
 		$this->mpm->getEmv('62')->getField('05')->setDefault('***');
+	}
+
+	/**
+	 * Change EMV MPM object.
+	 *
+	 * @param MPM $mpm
+	 * @since 2.0.0
+	 * @return self
+	 */
+	public function changeMpm ( MPM $mpm )
+	{
+		// Transaction Amount is Required
+		$mpm->getEmv('54')->required(true);
+		// Remove Payment URL
+		$mpm->getEmv('26')->removeField('25');
+		// Set default Reference Label
+		$mpm->getEmv('62')->getField('05')->setDefault('***');
+
+		$this->mpm = $mpm;
+		return $this;
 	}
 
 	/**
