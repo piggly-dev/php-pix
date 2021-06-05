@@ -7,14 +7,18 @@ use Piggly\Pix\Exceptions\InvalidPixKeyTypeException;
 
 /**
  * The Pix Parser class.
- * 
- * This is used to parse and format data following patterns and 
- * standards of a pix.
+ * This is used to parse and format data 
+ * following patterns and standards of a pix.
  *
- * @since      1.0.0
- * @package    Piggly\Pix
- * @subpackage Piggly\Pix
- * @author     Caique <caique@piggly.com.br>
+ * @package \Piggly\Pix
+ * @subpackage \Piggly\Pix
+ * @version 1.2.6
+ * @since 1.0.0
+ * @category Pix
+ * @author Caique Araujo <caique@piggly.com.br>
+ * @author Piggly Lab <dev@piggly.com.br>
+ * @license MIT
+ * @copyright 2021 Piggly Lab <dev@piggly.com.br>
  */
 class Parser
 {

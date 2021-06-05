@@ -7,14 +7,19 @@ use Piggly\Pix\Exceptions\InvalidPixCodeException;
 
 /**
  * The Pix Reader class.
- * 
- * This is used to extract pix data of a pix code and return the Payload
+ * This is used to extract pix data of a
+ * pix code and return the AbstractPayload
  * object with all data extracted.
  *
- * @since      1.1.0 
- * @package    Piggly\Pix
- * @subpackage Piggly\Pix
- * @author     Caique <caique@piggly.com.br>
+ * @package \Piggly\Pix
+ * @subpackage \Piggly\Pix
+ * @version 2.0.0
+ * @since 1.1.0
+ * @category Pix
+ * @author Caique Araujo <caique@piggly.com.br>
+ * @author Piggly Lab <dev@piggly.com.br>
+ * @license MIT
+ * @copyright 2021 Piggly Lab <dev@piggly.com.br>
  */
 class Reader
 {
