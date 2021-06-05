@@ -77,11 +77,11 @@ class Field extends AbstractField
 	 * Will auto cut string if length
 	 * is greater than size allowed.
 	 *
-	 * @param string $value Field value.
+	 * @param string|null $value Field value.
 	 * @since 2.0.0
 	 * @return self
 	 */
-	public function setValue ( string $value )
+	public function setValue ( ?string $value )
 	{ 
 		$len = \strlen($value);
 

@@ -1,6 +1,7 @@
 <?php
 namespace Piggly\Pix;
 
+use Piggly\Pix\Emv\MPM;
 use Piggly\Pix\Exceptions\InvalidEmvFieldException;
 
 /**
@@ -38,6 +39,30 @@ class DynamicPayload extends AbstractPayload
 		$this->mpm->getEmv('26')->removeField('02');
 		// Set default Reference Label
 		$this->mpm->getEmv('62')->getField('05')->setDefault('***');
+	}
+
+	/**
+	 * Change EMV MPM object.
+	 *
+	 * @param MPM $mpm
+	 * @since 2.0.0
+	 * @return self
+	 */
+	public function changeMpm ( MPM $mpm )
+	{
+		// Change point of initiation method
+		$mpm->getEmv('01')->setValue('12');
+		// Remove Transaction Amount
+		$mpm->removeEmv('54');
+		// Remove Pix Key
+		$mpm->getEmv('26')->removeField('01');
+		// Remove Payment Description
+		$mpm->getEmv('26')->removeField('02');
+		// Set default Reference Label
+		$mpm->getEmv('62')->getField('05')->setDefault('***');
+
+		$this->mpm = $mpm;
+		return $this;
 	}
 
 	/**
