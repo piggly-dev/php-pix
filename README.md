@@ -4,7 +4,7 @@
 
 > SUPORTE AO PHP 8.0
 
-[Versão Atual](https://img.shields.io/badge/version-2.x.x-green) [PHP](https://img.shields.io/packagist/php-v/piggly/php-pix)
+[![Versão Atual](https://img.shields.io/badge/version-2.x.x-green?style=flat-square)](#) [![PHP](https://img.shields.io/packagist/php-v/piggly/php-pix?style=flat-square)](#)
 
 O **Pix** é o mais novo método de pagamento eletrônico criado pelo **Banco Central do Brasil**. Você encontra todos os detalhes na [página oficial](https://www.bcb.gov.br/estabilidadefinanceira/pix) do Pix. Saiba mais como ele funciona e como nossa biblioteca trabalha [clicando aqui](https://github.com/piggly-dev/php-pix/wiki/04.-Pix).
 
@@ -20,6 +20,14 @@ Essa biblioteca foi criada para ser utilizada principalmente com o plugin de **W
 Leia sobre a solução de problemas [clicando aqui](https://github.com/piggly-dev/php-pix/wiki/09.-Solu%C3%A7%C3%A3o-de-Problemas) caso suas chaves Pix sejam inválidas. E, não deixe de conferir nossa [documentação completa](https://github.com/piggly-dev/php-pix/wiki).
 
 > Se você apreciar a função desta biblioteca e quiser apoiar este trabalho, sinta-se livre para fazer qualquer doação para a chave aleatória Pix `aae2196f-5f93-46e4-89e6-73bf4138427b` ❤.
+
+## Atualização para a versão 2.0.0
+
+Muitas coisas mudaram, além do suporte ao **PHP 8** os campos EMV foram otimizados e expandidos. Além disso, as requisições para APIs foram removidas e os payloads para as APIs foram reformulados. Recomendamos ler a documentação e verificar tudo o que mudou.
+
+A biblioteca `chillerlan/php-qrcode` não pode ser atualizada em `composer.json`, tornando necessário utilizar a `flag` `--ignore-platform-reqs` no **PHP 8**. Muitos utilizadores dessa biblioteca ainda utilizando a versão `7.2` do PHP e não é o momento ideal para perder esse suporte. A partir da versão `2.1.x` pretendemores remover esse suporte.
+
+Para realizar as requisições da api, recomendamos a biblioteca [piggly/php-api-client](https://github.com/piggly-dev/php-api-client), ela foi desenvolvida para ser flexível e muito mais robusta que a solução anterior utilizada na versão 1.x.x.
 
 ## Instalação
 
@@ -40,12 +48,6 @@ Essa bibliotecca possuí as seguintes dependências:
 
 * [Extensão GD do PHP](https://www.php.net/manual/pt_BR/book.image.php) para gerar QR Codes;
 * PHP +7.2 ou PHP +8.0.
-
-### Atualização para a versão 2.0.0
-
-Muitas coisas mudaram, além do suporte ao **PHP 8** os campos EMV foram otimizados e expandidos. Além disso, as requisições para APIs foram removidas e os payloads para as APIs foram reformulados. Recomendamos ler a documentação e verificar tudo o que mudou.
-
-Para realizar as requisições da api, recomendamos a biblioteca [piggly/php-api-client](https://github.com/piggly-dev/php-api-client), ela foi desenvolvida para ser flexível e muito mais robusta que a solução anterior utilizada na versão 1.x.x.
 
 ## Como utilizar?
 
@@ -88,7 +90,7 @@ Como o código utiliza o padrão do Pix é possível que funcione em todos os ba
 
 Ao enviar um e-mail ou abrir uma issue, certifique-se de informar:
 
-* Versão da Biblioteca: 1.1.0;
+* Versão da Biblioteca: 2.0.0;
 * Banco Emitente: NuBank;
 * Banco Pagador: Inter;
 * Tipo de Erro: O **QR Code** é inválido;
