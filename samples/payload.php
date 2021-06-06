@@ -23,17 +23,13 @@ try
 
 	$payload = 
 		(new StaticPayload())
-			// ->applyValidCharacters()
-			// ->applyUppercase()
-			// ->applyEmailWhitespace()
-			->setPixKey($keyType, $keyValue)
-			->setMerchantName($merchantName)
-			->setMerchantCity($merchantCity)
 			->setAmount($amount)
 			->setTid($tid)
-			->setDescription($description);
+			->setDescription($description)
+			->setPixKey($keyType, $keyValue)
+			->setMerchantName($merchantName)
+			->setMerchantCity($merchantCity);
 
-			
 	// Pix dinâmico
 	// Obtém os dados pix do usuário
 	// -> Dados obrigatórios
@@ -43,7 +39,7 @@ try
 	// Obtém os dados do SPI para o Pix
 	$payload = 
 	(new DynamicPayload())
-		->setPayloadUrl($spiUrl) // URL do Pix no SPI
+		->setUrl($spiUrl) // URL do Pix no SPI
 		->setMerchantName($merchantName)
 		->setMerchantCity($merchantCity);
 		
