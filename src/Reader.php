@@ -147,11 +147,12 @@ class Reader
 
 		// Create a new and fresh MPM instance
 		$mpm = new MPM();
+		$pixCode = $this->raw;
 
 		while ( !empty($pixCode) )
 		{ $this->extractor($pixCode, $mpm); }
 
-		$poi = $mpm->getEmv('01');
+		$poi = $mpm->getEmv('01')->getValue();
 
 		if ( $poi == 11 )
 		{ return (new StaticPayload())->changeMpm($mpm); }

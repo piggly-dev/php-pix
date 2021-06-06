@@ -28,6 +28,8 @@ class StaticPayload extends AbstractPayload
 	 */
 	public function __construct ()
 	{
+		parent::__construct();
+		
 		// Transaction Amount is Required
 		$this->mpm->getEmv('54')->required(true);
 		// Remove Payment URL
@@ -66,7 +68,7 @@ class StaticPayload extends AbstractPayload
 	 * @throws InvalidPixKeyTypeException When pix key type is invalid.
 	 * @throws InvalidPixKeyException When pix key is invalid base in key type.
 	 */
-	public function setKey ( string $type, string $key )
+	public function setPixKey ( string $type, string $key )
 	{
 		// Validate Key
 		Parser::validate($type, $key);
@@ -97,7 +99,7 @@ class StaticPayload extends AbstractPayload
 	 */
 	public function setDescription ( string $description )
 	{ 
-		$this->mpm->getEmv('26')->getField('02')->setValue(Cast::cleanStr(Cast::upperStr($description)));
+		$this->mpm->getEmv('26')->getField('02')->setValue(Cast::cleanStr(Cast::upperStr($description)), true);
 		return $this;
 	}
 
