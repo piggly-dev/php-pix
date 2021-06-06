@@ -40,7 +40,7 @@ abstract class AbstractPayload
 	 */
 	public function __construct()
 	{ $this->mpm = new MPM(); }
-	
+
 	/**
 	 * Set the current pix merchant name.
 	 * Max length 25
@@ -54,7 +54,7 @@ abstract class AbstractPayload
 	 */
 	public function setMerchantName ( string $merchantName )
 	{ 
-		$this->mpm->getEmv('59')->setValue(Cast::cleanStr(Cast::upperStr($merchantName)));
+		$this->mpm->getEmv('59')->setValue(Cast::upperStr(Cast::cleanStr($merchantName)));
 		return $this;
 	}
 
@@ -71,7 +71,7 @@ abstract class AbstractPayload
 	 */
 	public function setMerchantCity ( string $merchantCity  )
 	{ 
-		$this->mpm->getEmv('60')->setValue(Cast::cleanStr(Cast::upperStr($merchantCity)));
+		$this->mpm->getEmv('60')->setValue(Cast::upperStr(Cast::cleanStr($merchantCity)));
 		return $this;
 	}
 
@@ -88,7 +88,7 @@ abstract class AbstractPayload
 	 */
 	public function setPostalCode ( string $postalCode  )
 	{ 
-		$this->mpm->getEmv('61')->setValue(Cast::cleanStr(Cast::upperStr($postalCode), true));
+		$this->mpm->getEmv('61')->setValue(Cast::upperStr(Cast::cleanStr($postalCode), true));
 		return $this;
 	}
 	

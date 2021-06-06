@@ -4,7 +4,7 @@ namespace Piggly\Pix\Emv;
 use Piggly\Pix\Exceptions\InvalidEmvFieldException;
 
 /**
- * Abstract EMV field object.
+ * Base EMV field object.
  * 
  * @package \Piggly\Pix
  * @subpackage \Piggly\Pix\Emv
@@ -135,7 +135,7 @@ abstract class AbstractField
 	{ $this->id = $id; return $this; }
 
 	/**
- 	 *Export field to emv format: ID + LENGTH + VALUE.
+ 	 * Export field to emv format: ID + LENGTH + VALUE.
 	 *
 	 * @since 2.0.0
 	 * @return string
@@ -153,13 +153,7 @@ abstract class AbstractField
 			{ return ''; } 
 		}
 
-		$len = \strlen($value??'');
-		$size = $this->getSize();
-
-		if ( $len > $size )
-		{ throw new InvalidEmvFieldException($this->name, $value, \sprintf('Exceeded the maximum size of %s', $size)); }
-
-		$len = \str_pad( $len, 2, '0', STR_PAD_LEFT );
+		$len = \str_pad( \strlen($value), 2, '0', STR_PAD_LEFT );
 		return $this->id.$len.$value;
 	}
 }

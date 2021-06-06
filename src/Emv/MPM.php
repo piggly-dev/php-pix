@@ -32,7 +32,13 @@ class MPM
 	 * @since 2.0.0
 	 */
 	protected $code;
-
+	
+	/**
+	 * All default EMVS.
+	 * 
+	 * @since 2.0.0
+	 * @return void
+	 */
 	public function __construct ()
 	{
 		$this->emvs = [

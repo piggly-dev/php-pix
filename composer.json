@@ -23,7 +23,8 @@
     },
     "require-dev": {
         "php": "^7.3 || ^8.0",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "fakerphp/faker": "^1.14"
     },
     "scripts": {
         "test": "phpunit"

@@ -29,6 +29,8 @@ class DynamicPayload extends AbstractPayload
 	 */
 	public function __construct ()
 	{
+		parent::__construct();
+		
 		// Change point of initiation method
 		$this->mpm->getEmv('01')->setValue('12');
 		// Remove Transaction Amount
@@ -74,9 +76,7 @@ class DynamicPayload extends AbstractPayload
 	 */
 	public function setUrl ( string $url )
 	{
-		$url = \preg_replace('/(http[s]?)(\:\/\/)?/', '', $url);
-
-		if ( !\preg_match('/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/i', $url) )
+		if ( \preg_match('/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/i', $url) === false )
 		{ throw new InvalidEmvFieldException($this->mpm->getEmv('26')->getField('25')->getName(), $url, 'Não é uma URL válida.'); }
 	
 		$this->mpm->getEmv('26')->getField('25')->setValue($url);
