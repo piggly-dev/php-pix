@@ -1,6 +1,8 @@
 # Crie/Leia códigos Pix sem complicações com PHP
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/piggly/php-pix.svg?style=flat-square)](https://packagist.org/packages/piggly/php-pix) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE) 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/piggly/php-pix.svg?style=flat-square)](https://packagist.org/packages/piggly/php-pix) [![Packagist Downloads](https://img.shields.io/packagist/dt/piggly/php-pix?style=flat-square)](https://packagist.org/packages/piggly/php-pix) [![Packagist Stars](https://img.shields.io/packagist/stars/piggly/php-pix?style=flat-square)](https://packagist.org/packages/piggly/php-pix) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE) ![PHP](https://img.shields.io/packagist/php-v/piggly/php-pix?style=flat-square)
+
+![Versão Atual](https://img.shields.io/badge/version-2.x.x-green?style=flat-square) 
 
 O **Pix** é o mais novo método de pagamento eletrônico criado pelo **Banco Central do Brasil**. Você encontra todos os detalhes na [página oficial](https://www.bcb.gov.br/estabilidadefinanceira/pix) do Pix. Saiba mais como ele funciona e como nossa biblioteca trabalha [clicando aqui](https://github.com/piggly-dev/php-pix/wiki/04.-Pix).
 
@@ -11,29 +13,60 @@ Essa biblioteca foi criada para ser utilizada principalmente com o plugin de **W
 * Ler códigos Pix importando os dados Pix;
 * Criar payloads de Cobranças e Devoluções para interagir com as APIs Pix;
 * Usar uma base de comunicação com a Api para organizar seus códigos;
-* Gerar códigos compatíveis com o Pix versão 2.2.1, veja mais detalhes [clicando aqui](https://www.bcb.gov.br/content/estabilidadefinanceira/pix/Regulamento_Pix/II-ManualdePadroesparaIniciacaodoPix.pdf).
+* Gerar códigos compatíveis com a última versão do Pix.
 
 Leia sobre a solução de problemas [clicando aqui](https://github.com/piggly-dev/php-pix/wiki/09.-Solu%C3%A7%C3%A3o-de-Problemas) caso suas chaves Pix sejam inválidas. E, não deixe de conferir nossa [documentação completa](https://github.com/piggly-dev/php-pix/wiki).
 
-> Confira também nossa micro interface pix em [piggly/php-pix-app](https://github.com/piggly-dev/php-pix-app).
-
 > Se você apreciar a função desta biblioteca e quiser apoiar este trabalho, sinta-se livre para fazer qualquer doação para a chave aleatória Pix `aae2196f-5f93-46e4-89e6-73bf4138427b` ❤.
+
+## Atualização para a versão 2.0.0
+
+Muitas coisas mudaram, além do suporte ao **PHP 8** os campos EMV foram otimizados e expandidos. Além disso, as requisições para APIs foram removidas e os payloads para as APIs foram reformulados. Recomendamos ler a documentação de mudanças [clicando aqui](https://github.com/piggly-dev/php-pix/wiki/11.-Migrar-para-a-vers%C3%A3o-2.x.x) e verificar as diferenças.
+
+A biblioteca `chillerlan/php-qrcode` não pode ser atualizada em `composer.json`, tornando necessário utilizar a `flag` `--ignore-platform-reqs` no **PHP 8**. Veja abaixo:
+
+```bash
+# composer install
+composer --ignore-platform-req=php install
+
+# composer update
+composer --ignore-platform-req=php update
+
+# e todos os demais comandos do composer
+```
+
+> Muitos utilizadores dessa biblioteca ainda utilizando a versão `7.2` do PHP e não é o momento ideal para perder esse suporte. A partir da versão `2.1.x` pretendemores remover esse suporte.
+
+Para realizar as requisições da api, recomendamos a biblioteca [piggly/php-api-client](https://github.com/piggly-dev/php-api-client), ela foi desenvolvida para ser flexível e muito mais robusta que a solução anterior utilizada na versão 1.x.x.
+
+Veja as principais mudanças da versão 2.x.x:
+
+* O padrão EMV MPM foi atualizado e remodelado para suportar novos campos que podem ser utilizados nos Pix;
+* A validação e verificação das chaves Pix foi aprimorada;
+* A leitura de um código Pix resulta em um objeto de EMVs mais flexível;
+* Os modificadores do payload foram removidos, sendo que agora, todos os dados preenchidos são automaticamente tratados e cortados respeitando completamente o padrão EMV;
+* A classe `BaseAPI` foi removida, adotando como sugestão a biblioteca [piggly/php-api-client](https://github.com/piggly-dev/php-api-client) que traz muito mais flexibilidade e segurança;
+* Os payloads para APIs foram remodelados para serem mais eficientes e flexíveis.
 
 ## Instalação
 
-Essa biblioteca pode ser instalada via **Composer** com `composer require piggly/php-pix`;
+### Composer
 
-### Atualização da versão 1.2.1
+* No terminal, dentro da sua pasta do projeto, digite `composer require piggly/php-pix`;
+* Não esqueça de iniciar o composer incluindo o arquivo `require_once('vendor/autoload.php);` na base do código.
 
-Eba! Finalmente a Api Pix foi implementada ou, pelo menos, a base dela. Como recebemos muitas solicitações via e-mail [dev@piggly.com.br](mailto:dev@piggly.com.br) que gostaram da forma como nós programamos, decidimos fazer esse lançamento. Agora você poderá utilizar nossa estrutura para melhorar seu processo de comunicação com qualquer Api Pix. Veja mais detalhes na [documentação](https://github.com/piggly-dev/php-pix/wiki).
+### Instalação Manual
 
-### Atualização das versões < 1.1.* para 1.2.0
+* Baixe ou clone esse repositório com `git clone https://github.com/piggly-dev/php-pix.git`;
+* Depois, vá para a pasta `/path/to/php-pix` e dê o comando `composer install` para instalar todas as dependências.
+* Adicione o `autoload` do composer na base do seu projeto `require_once('/path/to/php-pix/vendor/autoload.php);`.
 
-Veja todos os detalhes [clicando aqui](https://github.com/piggly-dev/php-pix/releases/tag/1.2.0).
+## Dependências
 
-### Atualização das versões 1.0.* para 1.1.0
+Essa bibliotecca possuí as seguintes dependências:
 
-Veja todos os detalhes [clicando aqui](https://github.com/piggly-dev/php-pix/releases/tag/1.1.0).
+* [Extensão GD do PHP](https://www.php.net/manual/pt_BR/book.image.php) para gerar QR Codes;
+* PHP +7.2 ou PHP +8.0.
 
 ## Como utilizar?
 
@@ -76,7 +109,7 @@ Como o código utiliza o padrão do Pix é possível que funcione em todos os ba
 
 Ao enviar um e-mail ou abrir uma issue, certifique-se de informar:
 
-* Versão da Biblioteca: 1.1.0;
+* Versão da Biblioteca: 2.0.0;
 * Banco Emitente: NuBank;
 * Banco Pagador: Inter;
 * Tipo de Erro: O **QR Code** é inválido;

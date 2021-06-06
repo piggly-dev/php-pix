@@ -1,105 +1,85 @@
 <?php
 namespace Piggly\Pix;
 
+use Piggly\Pix\Emv\MPM;
+use Piggly\Pix\Exceptions\InvalidEmvFieldException;
+
 /**
- * The Pix Dynamic Payload class.
- * 
- * This is used to set up pix data and follow the EMV®1 pattern and standards.
- * When set up all data, the export() method will generate the full pix payload.
+ * Dynamic payload to Pix code. Used when
+ * pix was issued by an API and returned
+ * as a URL.
  *
- * @since      1.2.0 
- * @package    Piggly\Pix
- * @subpackage Piggly\Pix
- * @author     Caique <caique@piggly.com.br>
+ * @package \Piggly\Pix
+ * @subpackage \Piggly\Pix
+ * @version 2.0.0
+ * @since 2.0.0
+ * @category Payload
+ * @author Caique Araujo <caique@piggly.com.br>
+ * @author Piggly Lab <dev@piggly.com.br>
+ * @license MIT
+ * @copyright 2021 Piggly Lab <dev@piggly.com.br>
  */
-class DynamicPayload extends Payload
+class DynamicPayload extends AbstractPayload
 {
 	/**
-	 * Defines if payment is reusable.
-	 * @since 1.2.0
-	 * @var boolean
+	 * Set all default emvs to dynamic payload.
+	 * 
+	 * @since 2.0.0
+	 * @return void
 	 */
-	protected $reusable = false;
-	
-	/**
-	 * Payload url.
-	 * @since 1.2.0
-	 * @var string
-	 */
-	protected $payloadUrl;
+	public function __construct ()
+	{
+		parent::__construct();
+		
+		// Change point of initiation method
+		$this->mpm->getEmv('01')->setValue('12');
+		// Remove Transaction Amount
+		$this->mpm->removeEmv('54');
+		// Remove Pix Key
+		$this->mpm->getEmv('26')->removeField('01');
+		// Remove Payment Description
+		$this->mpm->getEmv('26')->removeField('02');
+		// Set default Reference Label
+		$this->mpm->getEmv('62')->getField('05')->setDefault('***');
+	}
 
 	/**
-	 * Set the current payload json url.
-	 * 
-	 * @param string $url
+	 * Change EMV MPM object.
+	 *
+	 * @param MPM $mpm
+	 * @since 2.0.0
 	 * @return self
 	 */
-	public function setPayloadUrl ( string $url )
+	public function changeMpm ( MPM $mpm )
 	{
-		$url = \preg_replace('/(http[s]?)(\:\/\/)?/', '', $url);
-		$this->payloadUrl = $url;
+		// Change point of initiation method
+		$mpm->getEmv('01')->setValue('12');
+		// Remove Transaction Amount
+		$mpm->removeEmv('54');
+		// Remove Pix Key
+		$mpm->getEmv('26')->removeField('01');
+		// Remove Payment Description
+		$mpm->getEmv('26')->removeField('02');
+		// Set default Reference Label
+		$mpm->getEmv('62')->getField('05')->setDefault('***');
+
+		$this->mpm = $mpm;
 		return $this;
 	}
 
 	/**
-	 * In dynamic payload pix key cannot be set. It will be ignored.
-	 * 
-	 * @param string $keyType Pix key type.
-	 * @param string $pixKey Pix key.
-	 * @since 1.2.0 Will be ignored
+	 * Set current payload JSON URL.
+	 *
+	 * @param string $url
+	 * @since 2.0.0
 	 * @return self
 	 */
-	public function setPixKey ( string $keyType, string $pixKey )
-	{ return $this; }
-
-	/**
-	 * In dynamic payload description cannot be set. It will be ignored.
-	 * 
-	 * @param string $description Pix description.
-	 * @since 1.2.0 Will be ignored
-	 * @return self
-	 */
-	public function setDescription ( string $description, bool $applyMaxLength = true )
-	{ return $this; }
-
-	/**
-	 * In dynamic payload always will be false. It will be ignored.
-	 * 
-	 * @param string $reusable If pix can be reusable.
-	 * @since 1.2.0 Will be ignored
-	 * @return self
-	 */
-	public function setAsReusable ( bool $reusable = true )
-	{ $this->reusable = false; return $this; }
-
-	/**
-	 * Get the current merchant account information.
-	 * 
-	 * EMV -> ID 26
-	 * 
-	 * @since 1.2.0
-	 * @return string
-	 */
-	protected function getMerchantAccountInformation () : string
+	public function setUrl ( string $url )
 	{
-		// Global bank domain
-		// ID 00
-		$gui = $this->formatID(
-			self::ID_MERCHANT_ACCOUNT_INFORMATION_GUI,
-			'br.gov.bcb.pix'
-		);
-
-		// Current payload url
-		// ID 02
-		$payloadUrl = $this->formatID(
-			self::ID_MERCHANT_ACCOUNT_INFORMATION_URL,
-			$this->payloadUrl,
-			false
-		);
-
-		return $this->formatID(
-			self::ID_MERCHANT_ACCOUNT_INFORMATION,
-			$gui.$payloadUrl
-		);
+		if ( \preg_match('/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/i', $url) === false )
+		{ throw new InvalidEmvFieldException($this->mpm->getEmv('26')->getField('25')->getName(), $url, 'Não é uma URL válida.'); }
+	
+		$this->mpm->getEmv('26')->getField('25')->setValue($url);
+		return $this;
 	}
 }

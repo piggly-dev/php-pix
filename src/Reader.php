@@ -2,42 +2,45 @@
 namespace Piggly\Pix;
 
 use Exception;
+use Piggly\Pix\Emv\Field;
+use Piggly\Pix\Emv\MPM;
+use Piggly\Pix\Emv\MultiField;
 use Piggly\Pix\Exceptions\CannotParseKeyTypeException;
 use Piggly\Pix\Exceptions\InvalidPixCodeException;
 
 /**
  * The Pix Reader class.
- * 
- * This is used to extract pix data of a pix code and return the Payload
+ * This is used to extract pix data of a
+ * pix code and return the AbstractPayload
  * object with all data extracted.
  *
- * @since      1.1.0 
- * @package    Piggly\Pix
- * @subpackage Piggly\Pix
- * @author     Caique <caique@piggly.com.br>
+ * @package \Piggly\Pix
+ * @subpackage \Piggly\Pix
+ * @version 2.0.0
+ * @since 1.1.0
+ * @category Pix
+ * @author Caique Araujo <caique@piggly.com.br>
+ * @author Piggly Lab <dev@piggly.com.br>
+ * @license MIT
+ * @copyright 2021 Piggly Lab <dev@piggly.com.br>
  */
 class Reader
 {
 	/**
 	 * Pix code.
+	 * 
 	 * @since 1.1.0
 	 * @var string
 	 */
 	protected $raw;
 
 	/**
-	 * Pix code.
-	 * @since 1.1.0
-	 * @var string
+	 * EMV MPM object.
+	 * 
+	 * @since 2.0.0
+	 * @var MPM
 	 */
-	protected $pixCode = '';
-
-	/**
-	 * Pix code.
-	 * @since 1.1.0
-	 * @var array
-	 */
-	protected $emvs;
+	protected $mpm;
 
 	/**
 	 * Set the current pix code.
@@ -58,6 +61,7 @@ class Reader
 	 * 
 	 * @since 1.1.0
 	 * @since 1.2.0 Custom exception; Throw exception when pix code is invalid.
+	 * @since 2.0.0 Work with EMV MPM object.
 	 * @param string $pixCode Current pix code to extract...
 	 * @return self
 	 * @throws InvalidPixCodeException When pix code is invalid.
@@ -67,49 +71,50 @@ class Reader
 		if ( !$this->isValidCode($pixCode) )
 		{ throw new InvalidPixCodeException($pixCode); }
 
-		$this->pixCode = $pixCode; 
-		$this->raw     = $pixCode; 
-		$this->emvs    = [];
+		$this->raw = $pixCode; 
+		$this->mpm = new MPM();
 
-		while ( !empty($this->pixCode) )
-		{
-			$currId = $this->getData(2, $this->pixCode);
-			$this->emvs[] = $this->getEMV($currId, $this->pixCode);
-
-			switch ( $currId )
-			{
-				case Payload::ID_MERCHANT_ACCOUNT_INFORMATION:
-				case Payload::ID_ADDITIONAL_DATA_FIELD_TEMPLATE:
-					$this->extractChild( count($this->emvs)-1 );
-					break;
-				default:
-					break;
-			}
-		}
+		while ( !empty($pixCode) )
+		{ $this->extractor($pixCode, $this->mpm); }
 
 		return $this;
 	}
 
 	/**
-	 * Read the value to current EMV index, and mounting each EMV child 
-	 * field and adding it to an array.
+	 * Extract from $code all $emvs.
 	 * 
-	 * @since 1.1.0
-	 * @return void
+	 * @param string $code
+	 * @param MPM|MultiField $emvs
+	 * @since 2.0.0
+	 * @return self
 	 */
-	protected function extractChild( int $index )
+	protected function extractor ( string &$code, $emvs = null )
 	{
-		$emv   =& $this->emvs[$index];
-		$value =  $emv['value'];
-		$data  =  [];
+		$curr_id  = $this->getData($code, 2);
+		$curr_emv = $this->getEMV($curr_id, $code);
 
-		while ( !empty( $value ) )
-		{
-			$currId = $this->getData(2, $value);
-			$data[] = $this->getEMV($currId, $value);
+		$emv = $emvs instanceof MPM ? $emvs->getEmv($curr_id) : $emvs->getField($curr_id);
+
+		if ( \is_null($emv) )
+		{ return $this; }
+
+		if ( $emv instanceof Field )
+		{ 
+			$emv->setValue($curr_emv['value']); 
+			return $this;
 		}
-		
-		$emv['value'] = $data;
+
+		if ( $emv instanceof MultiField )
+		{ 
+			$pixCode = $curr_emv['value'];
+
+			while ( !empty($pixCode) )
+			{ $this->extractor($pixCode, $emv); }
+
+			return $this;
+		}
+
+		return $this;
 	}
 
 	/**
@@ -122,272 +127,155 @@ class Reader
 	{ return $this->raw; }
 
 	/**
-	 * An array with all emvs.
-	 * 
-	 * @since 1.1.0
-	 * @return string
-	 */
-	public function getEMVs () : array 
-	{ return $this->emvs; }
-
-	/**
 	 * Will export EMVs to a payload object.
+	 * 
+	 * Return StaticPayload when the Point of Initiation Method
+	 * is equal to 11, and return DynamicPayload when is equal
+	 * to 12.
 	 * 
 	 * @since 1.2.0
 	 * @since 1.2.1 Get pix key type only when pix key exists.
-	 * @return Payload
+	 * @since 2.0.0 Work with EMV MPM object.
+	 * @return StaticPayload|DynamicPayload
 	 * @throws InvalidPixCodeException
 	 * @throws CannotParseKeyTypeException
 	 */
-	public function export () : Payload
+	public function export ()
 	{
 		if ( !$this->isValidCode($this->raw) )
 		{ throw new InvalidPixCodeException($this->raw); }
 
-		$poi = $this->getPointOfInitiation();
+		// Create a new and fresh MPM instance
+		$mpm = new MPM();
+		$pixCode = $this->raw;
 
-		if ( $poi === '11' )
-		{
-			// Static
-			$payload = new StaticPayload();
+		while ( !empty($pixCode) )
+		{ $this->extractor($pixCode, $mpm); }
 
-			$merchantName = $this->getMerchantName();
-			$merchantCity = $this->getMerchantCity();
-			$pixKey       = $this->getPixKey();
-			$description  = $this->getDescription();
-			$amount       = $this->getAmount();
-			$tid          = $this->getTid();
+		$poi = $mpm->getEmv('01')->getValue();
 
-			if ( !empty($merchantName) )
-			{ $payload->setMerchantName($merchantName); }
+		if ( $poi == 11 )
+		{ return (new StaticPayload())->changeMpm($mpm); }
+		else if ( $poi == 12 )
+		{ return (new DynamicPayload())->changeMpm($mpm); }
 
-			if ( !empty($merchantCity) )
-			{ $payload->setMerchantCity($merchantCity); }
+		$url = $mpm->getEmv('26')->getField('25')->getValue();
 
-			if ( !empty($pixKey) )
-			{ 
-				$pixKeyType   = Parser::getKeyType($this->getPixKey());
-				$payload->setPixKey($pixKeyType, $pixKey); 
-			}
+		if ( empty($url) )
+		{ return (new StaticPayload())->changeMpm($mpm); }
+		else
+		{ return (new DynamicPayload())->changeMpm($mpm); }
 
-			if ( !empty($description) )
-			{ $payload->setDescription($description); }
-
-			if ( !empty($amount) )
-			{ $payload->setAmount($amount); }
-
-			if ( !empty($tid) )
-			{ $payload->setTid($tid); }
-		}
-		else 
-		{
-			// Dynamic
-			$payload = new DynamicPayload();
-
-			$merchantName = $this->getMerchantName();
-			$merchantCity = $this->getMerchantCity();
-			$amount       = $this->getAmount();
-			$tid          = $this->getTid();
-
-			if ( !empty($merchantName) )
-			{ $payload->setMerchantName($merchantName); }
-
-			if ( !empty($merchantCity) )
-			{ $payload->setMerchantCity($merchantCity); }
-
-			if ( !empty($amount) )
-			{ $payload->setAmount($amount); }
-		}
-
-		return $payload;
+		// Cannot determine the Point of Initiation Method
+		throw new InvalidPixCodeException($this->raw);
 	}
 
 	/**
-	 * Get a EMV field by your ID.
-	 * 
-	 * @param string $id
-	 * @param array $emvs Default is $this->emvs
-	 * @since 1.2.4
-	 * @return array|null
+	 * Get the EMV MPM object.
+	 *
+	 * @since 2.0.0
+	 * @return MPM
 	 */
-	public function getField ( string $id, ?array $emvs = null ) : ?array
-	{
-		if ( !empty($emvs) && !isset($emvs['value']) )
-		{ return null; }
-
-		$emv = empty($emvs) ? $this->findEMV( $id ) : $this->findEMV( $id, $emvs['value'] );
-
-		if ( !empty( $emv ) )
-		{ return $emv; }
-
-		return null;
-	}
-
-	/**
-	 * Get current point of initiation
-	 * 
-	 * @since 1.1.0
-	 * @return string|null
-	 */
-	public function getPointOfInitiation () : ?string
-	{
-		$emv = $this->findEMV( Payload::ID_POINT_OF_INITIATION_METHOD );
-
-		if ( !empty( $emv ) )
-		{ return $emv['value']; }
-
-		return '11';
-	}
+	public function getMPM () : MPM
+	{ return $this->mpm; }
 
 	/**
 	 * Get current Pix Key.
 	 * 
 	 * @since 1.1.0
+	 * @since 2.0.0 Changed to MPM object.
 	 * @return string|null
 	 */
 	public function getPixKey () : ?string
-	{
-		$emv = $this->findEMV( Payload::ID_MERCHANT_ACCOUNT_INFORMATION );
-
-		if ( !empty( $emv ) )
-		{
-			$emv = $this->findEMV( Payload::ID_MERCHANT_ACCOUNT_INFORMATION_KEY, $emv['value'] );
-
-			if ( !empty( $emv ) )
-			{ return $emv['value']; }
-		}
-
-		return null;
-	}
+	{ return $this->mpm->getEmv('26')->getField('01')->getValue();	}
 
 	/**
 	 * Get current Pix description.
 	 * 
 	 * @since 1.1.0
+	 * @since 2.0.0 Changed to MPM object.
 	 * @return string|null
 	 */
 	public function getDescription () : ?string
-	{
-		$emv = $this->findEMV( Payload::ID_MERCHANT_ACCOUNT_INFORMATION );
+	{ return $this->mpm->getEmv('26')->getField('02')->getValue();	}
 
-		if ( !empty( $emv ) )
-		{
-			$emv = $this->findEMV( Payload::ID_MERCHANT_ACCOUNT_INFORMATION_DESCRIPTION, $emv['value'] );
-
-			if ( !empty( $emv ) )
-			{ return $emv['value']; }
-		}
-
-		return null;
-	}
+	/**
+	 * Get current Pix payment url.
+	 * 
+	 * @since 1.1.0
+	 * @since 2.0.0 Changed to MPM object.
+	 * @return string|null
+	 */
+	public function getUrl () : ?string
+	{ return $this->mpm->getEmv('26')->getField('25')->getValue();	}
 
 	/**
 	 * Get current Pix amount.
+	 * If pix amount is not set it will return zero.
 	 * 
 	 * @since 1.1.0
-	 * @return float|null
+	 * @since 2.0.0 Changed to MPM object.
+	 * @return float
 	 */
-	public function getAmount () : ?float
-	{
-		$emv = $this->findEMV( Payload::ID_TRANSACTION_AMOUNT );
-
-		if ( !empty( $emv ) )
-		{ return floatval($emv['value']); }
-
-		return null;
-	}
+	public function getAmount () : float
+	{ return \floatval($this->mpm->getEmv('54')->getValue()??0); }
 
 	/**
 	 * Get current Pix merchant name.
 	 * 
 	 * @since 1.1.0
+	 * @since 2.0.0 Changed to MPM object.
 	 * @return string|null
 	 */
 	public function getMerchantName () : ?string
-	{
-		$emv = $this->findEMV( Payload::ID_MERCHANT_NAME );
-
-		if ( !empty( $emv ) )
-		{ return $emv['value']; }
-
-		return null;
-	}
+	{ return $this->mpm->getEmv('59')->getValue(); }
 
 	/**
-	 * Get current Pix merchant name.
+	 * Get current Pix merchant city.
 	 * 
 	 * @since 1.1.0
+	 * @since 2.0.0 Changed to MPM object.
 	 * @return string|null
 	 */
 	public function getMerchantCity () : ?string
-	{
-		$emv = $this->findEMV( Payload::ID_MERCHANT_CITY );
+	{ return $this->mpm->getEmv('60')->getValue(); }
 
-		if ( !empty( $emv ) )
-		{ return $emv['value']; }
-
-		return null;
-	}
+	/**
+	 * Get current Pix postal code.
+	 * 
+	 * @since 1.1.0
+	 * @since 2.0.0 Changed to MPM object.
+	 * @return string|null
+	 */
+	public function getPostalCode () : ?string
+	{ return $this->mpm->getEmv('61')->getValue(); }
 
 	/**
 	 * Get current Pix transaction id.
 	 * 
 	 * @since 1.1.0
+	 * @since 2.0.0 Changed to MPM object.
 	 * @return string|null
 	 */
 	public function getTid () : ?string
-	{
-		$emv = $this->findEMV( Payload::ID_ADDITIONAL_DATA_FIELD_TEMPLATE );
-
-		if ( !empty( $emv ) )
-		{
-			$emv = $this->findEMV( Payload::ID_ADDITIONAL_DATA_FIELD_TEMPLATE_TID, $emv['value'] );
-
-			if ( !empty( $emv ) )
-			{ return $emv['value']; }
-		}
-
-		return null;
-	}
-
-	/**
-	 * Find an EMV based in your id.
-	 * 
-	 * @since 1.1.0
-	 * @param string $id
-	 * @param array $emvs Default is $this->emvs
-	 * @return array|null
-	 */
-	protected function findEMV ( string $id, ?array $emvs = null ) : ?array
-	{
-		if ( empty( $emvs ) )
-		{ $emvs = $this->emvs; }
-
-		foreach ( $emvs as $emv )
-		{
-			if ( $emv['id'] === $id )
-			{ return $emv; }
-		}
-
-		return null;
-	}
+	{ return $this->mpm->getEmv('62')->getField('05')->getValue(); }
 
 	/**
 	 * Get EMV from $code string extracting your id, size and value.
 	 * 
-	 * @since 1.1.0
-	 * @param string $id
 	 * @param string $code
+	 * @param string $id
+	 * @since 1.1.0
 	 * @return array
 	 */
-	protected function getEMV ( $id, &$code ) : array 
+	protected function getEMV ( string $id, string &$code ) : array 
 	{
-		$size = $this->getData(2, $code);
+		$size = $this->getData($code, 2);
 
 		return [
 			'id' => $id,
 			'size' => $size,
-			'value' => $this->getData( intval($size), $code )
+			'value' => $this->getData($code, \intval($size))
 		];
 	}
 
@@ -395,21 +283,25 @@ class Reader
 	 * Updates the code string extracting data and returning data
 	 * extracted.
 	 * 
+	 * @param string $code
+	 * @param int $size
 	 * @since 1.1.0
+	 * @since 2.0.0 Changed parameters
 	 * @return string
 	 */
-	protected function getData ( int $size = 2, &$code ) : string
+	protected function getData ( string &$code, int $size = 2 ) : string
 	{ 
 		// Extract string till $size position
-		$extracted = mb_substr($code, 0, $size);
+		$extracted = \mb_substr($code, 0, $size);
 		// Update data after $size position
-		$code = mb_substr($code, $size );
+		$code = \mb_substr($code, $size );
 		return $extracted; 
 	}
 
 	/**
 	 * Validates if pix code is QRCPS-MPM version.
 	 * 
+	 * @since 1.1.0
 	 * @return bool
 	 */
 	protected function isValidCode ( string $pixCode ) : bool

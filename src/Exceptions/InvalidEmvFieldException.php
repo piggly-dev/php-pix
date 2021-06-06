@@ -3,6 +3,19 @@ namespace Piggly\Pix\Exceptions;
 
 use Exception;
 
+/**
+ * Exception when EMV field is invalid.
+ *
+ * @package \Piggly\Pix
+ * @subpackage \Piggly\Pix\Exceptions
+ * @version 1.2.0
+ * @since 1.2.0
+ * @category Exception
+ * @author Caique Araujo <caique@piggly.com.br>
+ * @author Piggly Lab <dev@piggly.com.br>
+ * @license MIT
+ * @copyright 2021 Piggly Lab <dev@piggly.com.br>
+ */
 class InvalidEmvFieldException extends Exception
 {
 	/**
@@ -62,7 +75,7 @@ class InvalidEmvFieldException extends Exception
 		$this->fieldMessage = $error;
 
 		parent::__construct(
-			\sprintf('O valor `%s` para o EMV `%s` é invalido: %s', $emvField, $emvValue, $error )
+			\sprintf('O valor `%s` para o EMV `%s` é invalido: %s.', $emvField, $emvValue, $error )
 		);
 	}
 }

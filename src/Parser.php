@@ -7,14 +7,18 @@ use Piggly\Pix\Exceptions\InvalidPixKeyTypeException;
 
 /**
  * The Pix Parser class.
- * 
- * This is used to parse and format data following patterns and 
- * standards of a pix.
+ * This is used to parse and format data 
+ * following patterns and standards of a pix.
  *
- * @since      1.0.0
- * @package    Piggly\Pix
- * @subpackage Piggly\Pix
- * @author     Caique <caique@piggly.com.br>
+ * @package \Piggly\Pix
+ * @subpackage \Piggly\Pix
+ * @version 1.2.6
+ * @since 1.0.0
+ * @category Pix
+ * @author Caique Araujo <caique@piggly.com.br>
+ * @author Piggly Lab <dev@piggly.com.br>
+ * @license MIT
+ * @copyright 2021 Piggly Lab <dev@piggly.com.br>
  */
 class Parser
 {
@@ -56,36 +60,37 @@ class Parser
 	 * 
 	 * @since 1.0.0
 	 * @since 1.2.0 Added a custom exception error
-	 * @param string $keyType Pix key type.
+	 * @since 2.0.0 Changed parameters
+	 * @param string $type Pix key type.
 	 * @param string $value Pix key value.
 	 * @throws InvalidPixKeyTypeException When pix key type is invalid.
 	 * @throws InvalidPixKeyException When pix key is invalid base in key type.
 	 */
-	public static function validate ( string $keyType, string $keyValue )
+	public static function validate ( string $type, string $value )
 	{
-		if ( !in_array($keyType, [self::KEY_TYPE_RANDOM, self::KEY_TYPE_DOCUMENT, self::KEY_TYPE_EMAIL, self::KEY_TYPE_PHONE]) )
-		{ throw new InvalidPixKeyTypeException($keyType); }
+		if ( !in_array($type, [self::KEY_TYPE_RANDOM, self::KEY_TYPE_DOCUMENT, self::KEY_TYPE_EMAIL, self::KEY_TYPE_PHONE]) )
+		{ throw new InvalidPixKeyTypeException($type); }
 
 		$validate = false;
 
-		switch ( $keyType )
+		switch ( $type )
 		{
 			case self::KEY_TYPE_RANDOM:
-				$validate = self::validateRandom($keyValue);
+				$validate = self::validateRandom($value);
 				break;
 			case self::KEY_TYPE_DOCUMENT:
-				$validate = self::validateDocument($keyValue);
+				$validate = self::validateDocument($value);
 				break;
 			case self::KEY_TYPE_EMAIL:
-				$validate = self::validateEmail($keyValue);
+				$validate = self::validateEmail($value);
 				break;
 			case self::KEY_TYPE_PHONE:
-				$validate = self::validatePhone($keyValue);
+				$validate = self::validatePhone($value);
 				break;
 		}
 
 		if ( !$validate )
-		{ throw new InvalidPixKeyException($keyType, $keyValue); }
+		{ throw new InvalidPixKeyException($type, $value); }
 	}
 
 	/**
@@ -227,26 +232,27 @@ class Parser
 	 * 
 	 * @since 1.0.0
 	 * @since 1.2.0 Custom exception error
-	 * @param string $key Pix key.
-	 * @param string $value Pix value.
+	 * @since 2.0.0 Changed parameters
+	 * @param string $type Pix key type.
+	 * @param string $key Pix key value value.
 	 * @return string
 	 * @throws InvalidPixKeyTypeException pix key type is invalid
 	 */
-	public static function parse ( string $key, string $value ) : string
+	public static function parse ( string $type, string $key ) : string
 	{
-		switch ( $key )
+		switch ( $type )
 		{
 			case self::KEY_TYPE_RANDOM:
-				return $value;
+				return $key;
 			case self::KEY_TYPE_DOCUMENT:
-				return self::parseDocument($value);
+				return self::parseDocument($key);
 			case self::KEY_TYPE_EMAIL:
-				return self::parseEmail($value);
+				return self::parseEmail($key);
 			case self::KEY_TYPE_PHONE:
-				return self::parsePhone($value);
+				return self::parsePhone($key);
 		}
 
-		throw new InvalidPixKeyTypeException($key);
+		throw new InvalidPixKeyTypeException($type);
 	}
 
 	/**
