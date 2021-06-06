@@ -294,6 +294,7 @@ class Reader
 	/**
 	 * Validates if pix code is QRCPS-MPM version.
 	 * 
+	 * @since 1.1.0
 	 * @return bool
 	 */
 	protected function isValidCode ( string $pixCode ) : bool
