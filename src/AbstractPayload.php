@@ -42,6 +42,20 @@ abstract class AbstractPayload
 	{ $this->mpm = new MPM(); }
 
 	/**
+	 * Some banks may not allow the point
+	 * of initiation method. This method
+	 * removes it.
+	 *
+	 * @since 2.0.0
+	 * @return void
+	 */
+	public function unsetPointOfInitiation ()
+	{
+		$this->mpm->removeEmv('01');
+		return $this;
+	}
+
+	/**
 	 * Set the current pix merchant name.
 	 * Max length 25
 	 * 

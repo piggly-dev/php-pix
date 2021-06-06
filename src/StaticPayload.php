@@ -32,6 +32,8 @@ class StaticPayload extends AbstractPayload
 		
 		// Transaction Amount is Required
 		$this->mpm->getEmv('54')->required(true);
+		// Pix Key is Required
+		$this->mpm->getEmv('26')->getField('01')->required(true);
 		// Remove Payment URL
 		$this->mpm->getEmv('26')->removeField('25');
 		// Set default Reference Label
@@ -49,6 +51,8 @@ class StaticPayload extends AbstractPayload
 	{
 		// Transaction Amount is Required
 		$mpm->getEmv('54')->required(true);
+		// Pix Key is Required
+		$this->mpm->getEmv('26')->getField('01')->required(true);
 		// Remove Payment URL
 		$mpm->getEmv('26')->removeField('25');
 		// Set default Reference Label
@@ -72,7 +76,8 @@ class StaticPayload extends AbstractPayload
 	{
 		// Validate Key
 		Parser::validate($type, $key);
-		return $this->mpm->getEmv('26')->getField('01')->setValue(Parser::parse($type, $key));
+		$this->mpm->getEmv('26')->getField('01')->setValue(Parser::parse($type, $key));
+		return $this;
 	}
 
 	/**
@@ -99,7 +104,7 @@ class StaticPayload extends AbstractPayload
 	 */
 	public function setDescription ( string $description )
 	{ 
-		$this->mpm->getEmv('26')->getField('02')->setValue(Cast::cleanStr(Cast::upperStr($description)), true);
+		$this->mpm->getEmv('26')->getField('02')->setValue(Cast::upperStr(Cast::cleanStr($description)), true);
 		return $this;
 	}
 
@@ -127,7 +132,7 @@ class StaticPayload extends AbstractPayload
 		if ( is_null( $tid ) )
 		{ $_tid = Parser::getRandom(); }
 		else 
-		{ $_tid = preg_replace('/[^A-Za-z\0-9]+/', '', $tid);}
+		{ $_tid = preg_replace('/[^A-Za-z0-9]+/', '', $tid);}
 				
 		$this->mpm->getEmv('62')->getField('05')->setValue($_tid);
 		return $this;
@@ -164,34 +169,3 @@ class StaticPayload extends AbstractPayload
 		return $this; 
 	}
 }
-
-// /**
-//  * The Pix Payload class.
-//  * 
-//  * This is used to set up pix data and follow the EMV®1 pattern and standards.
-//  * When set up all data, the export() method will generate the full pix payload.
-//  *
-//  * @since      1.0.0 
-//  * @package    Piggly\Pix
-//  * @subpackage Piggly\Pix
-//  * @author     Caique <caique@piggly.com.br>
-//  */
-// class StaticPayload extends Payload
-// {
-// 	/**
-// 	 * Defines if payment is reusable.
-// 	 * @since 1.2.0
-// 	 * @var boolean
-// 	 */
-// 	protected $reusable = true;
-
-// 	/**
-// 	 * In static payload always will be true. It will be ignored.
-// 	 * 
-// 	 * @param string $reusable If pix can be reusable.
-// 	 * @since 1.2.0 Will be ignored
-// 	 * @return self
-// 	 */
-// 	public function setAsReusable ( bool $reusable = true )
-// 	{ $this->reusable = true; return $this; }
-// }

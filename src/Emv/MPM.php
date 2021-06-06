@@ -101,6 +101,7 @@ class MPM
 	 * @param bool $regenerate
 	 * @since 2.0.0
 	 * @return string
+	 * @throws InvalidEmvFieldException When field is wrong.
 	 */
 	public function export ( bool $regenerate = false ) : string
 	{
