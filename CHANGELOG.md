@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.8
+
+* Correção no CRC16 quando o hexadecimal possui zeros à esquerda.
+
 ## 1.2.7
 
 * Correções no método `Parser::getKeyType()` e no método `Payload::replacesChar()`.
