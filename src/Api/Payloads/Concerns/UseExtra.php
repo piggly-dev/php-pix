@@ -1,11 +1,11 @@
 <?php
-namespace Piggly\Pix\Api\Payloads\Entities\Concerns;
+namespace Piggly\Pix\Api\Payloads\Concerns;
 
 /**
  * Add extra fields behavior to a payload or entity.
  * 
  * @package \Piggly\Pix
- * @subpackage \Piggly\Pix\Api\Payloads\Entities\Concerns
+ * @subpackage \Piggly\Pix\Api\Payloads\Concerns
  * @version 2.0.0
  * @since 2.0.0
  * @category Concern

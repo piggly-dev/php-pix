@@ -51,7 +51,7 @@ class Location
 	 * @since 2.0.0
 	 * @var string
 	 */
-	protected $type = Cob::TYPE_IMMEDIATE;
+	protected $type;
 
 	/**
 	 * Date when location was created.
@@ -174,8 +174,11 @@ class Location
 	{
 		$array = [];
 		
-		if ( !empty($this->id) )
+		if ( !\is_null($this->id) )
 		{ $array['id'] = $this->id; }
+
+		if ( !empty($this->tid) )
+		{ $array['txid'] = $this->tid; }
 
 		if ( !empty($this->location) )
 		{ $array['location'] = $this->location; }
@@ -185,9 +188,6 @@ class Location
 
 		if ( !empty($this->createdAt) )
 		{ $array['criacao'] = $this->createdAt->format(DateTime::RFC3339); }
-
-		if ( !empty($this->tid) )
-		{ $array['txid'] = $this->tid; }
 
 		return $array;
 	}

@@ -4,9 +4,10 @@ namespace Piggly\Pix\Api\Payloads;
 use Exception;
 use Piggly\Pix\Api\Payloads\Entities\Amount;
 use Piggly\Pix\Api\Payloads\Entities\Calendar;
-use Piggly\Pix\Api\Payloads\Entities\Concerns\UseExtra;
+use Piggly\Pix\Api\Payloads\Concerns\UseExtra;
 use Piggly\Pix\Api\Payloads\Entities\Location;
 use Piggly\Pix\Api\Payloads\Entities\Person;
+use Piggly\Pix\Api\Payloads\Entities\Pix;
 use Piggly\Pix\Exceptions\CannotParseKeyTypeException;
 use Piggly\Pix\Exceptions\InvalidFieldException;
 use Piggly\Pix\Parser;
@@ -68,6 +69,20 @@ class Cob
 	 * @since 2.0.0
 	 */
 	const STATUS_REMOVED_BY_PSP = 'REMOVIDA_PELO_PSP';
+
+	/**
+	 * All cob status available.
+	 * 
+	 * @var array<string>
+	 * @since 2.0.0
+	 */
+	const STATUSES = [
+		self::STATUS_UNSET,
+		self::STATUS_ACTIVE,
+		self::STATUS_FINISHED,
+		self::STATUS_REMOVED_BY_RECEPTOR,
+		self::STATUS_REMOVED_BY_PSP
+	];
 	
 	/**
 	 * Cob type as "COB_IMMEDIATE". 
@@ -94,20 +109,6 @@ class Cob
 	const TYPES = [
 		self::TYPE_IMMEDIATE,
 		self::TYPE_DUE
-	];
-
-	/**
-	 * All cob status available.
-	 * 
-	 * @var array<string>
-	 * @since 2.0.0
-	 */
-	const STATUSES = [
-		self::STATUS_UNSET,
-		self::STATUS_ACTIVE,
-		self::STATUS_FINISHED,
-		self::STATUS_REMOVED_BY_RECEPTOR,
-		self::STATUS_REMOVED_BY_PSP
 	];
 
 	/**
@@ -150,6 +151,14 @@ class Cob
 	protected $location;
 
 	/**
+	 * Pix data.
+	 * 
+	 * @since 2.0.0
+	 * @var Pix
+	 */
+	protected $pix;
+
+	/**
 	 * Pix key.
 	 * @since 2.0.0
 	 * @var string
@@ -184,7 +193,7 @@ class Cob
 	 * @since 2.0.0
 	 * @var int
 	 */
-	protected $revision = 0;
+	protected $revision;
 	
 	/**
 	 * Cob status.
@@ -192,7 +201,7 @@ class Cob
 	 * @since 2.0.0
 	 * @var string
 	 */
-	protected $sttatus = self::STATUS_UNSET;
+	protected $status;
 
 	/**
 	 * Set the cob receiver.
@@ -245,6 +254,16 @@ class Cob
 	 */
 	public function setLocation ( Location $location )
 	{ $this->location = $location; return $this;	}
+
+	/**
+	 * Set the cob pix data.
+	 * 
+	 * @param Pix $pix
+	 * @since 2.0.0
+	 * @return self
+	 */
+	public function setPix ( Pix $pix )
+	{ $this->pix = $pix; return $this;	}
 
 	/**
 	 * Set the cob pix key.
@@ -356,6 +375,15 @@ class Cob
 	{ return $this->location; }
 
 	/**
+	 * Get pix to current cob.
+	 * 
+	 * @since 2.0.0
+	 * @return Pix|null
+	 */
+	public function getPix () : ?Pix
+	{ return $this->pix; }
+
+	/**
 	 * Get pix key to current cob.
 	 * 
 	 * @since 2.0.0
@@ -437,11 +465,14 @@ class Cob
 		if ( isset($this->requestToDebtor) )
 		{ $array['solicitacaoPagador'] = $this->requestToDebtor; }
 
-		if ( isset($this->extras) )
+		if ( isset($this->revision) )
+		{ $array['revisao'] = $this->revision; }
+
+		if ( !empty($this->extra) )
 		{ 
 			$array['infoAdicionais'] = [];
 
-			foreach ( $this->extras as $name => $value )
+			foreach ( $this->extra as $name => $value )
 			{ 
 				$array['infoAdicionais'][] = [
 					'nome' => $name,
@@ -453,14 +484,14 @@ class Cob
 		if ( isset($this->tid) )
 		{ $array['txid'] = $this->tid; }
 
-		if ( !empty($this->revision) )
-		{ $array['revision'] = $this->revision; }
-
-		if ( isset($this->status) && $this->status !== static::STATUS_UNSET )
+		if ( isset($this->status) )
 		{ $array['status'] = $this->status; }
 
 		if ( isset($this->location) )
 		{ $array['loc'] = $this->location->export(); }
+
+		if ( isset($this->pix) )
+		{ $array['pix'] = $this->pix->export(); }
 
 		return $array;
 	}
@@ -509,6 +540,9 @@ class Cob
 		
 		if ( isset($response['valor']) )
 		{ $this->setAmount((new Amount())->import($response['valor'])); }
+
+		if ( isset($response['pix']) )
+		{ $this->setPix((new Pix())->import($response['pix'])); }
 
 		return $this;
 	}

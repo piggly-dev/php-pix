@@ -173,7 +173,7 @@ class Calendar
 		{ $array['expiracao'] = $this->expiresIn; }
 
 		if ( isset( $this->dueDate ) )
-		{ $array['dataDeVencimento'] = $this->dueDate->format('yyyy-mm-dd'); }
+		{ $array['dataDeVencimento'] = $this->dueDate->format('Y-m-d'); }
 
 		if ( isset( $this->expirationAfter ) )
 		{ $array['validadeAposVencimento'] = $this->expirationAfter; }

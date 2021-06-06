@@ -116,11 +116,11 @@ class Amount
 	public function export () : array
 	{
 		$array = [
-			'original' => \number_format($this->original, 2, '.')
+			'original' => \number_format($this->original, 2, '.', '')
 		];
 
 		if ( !empty($this->final) )
-		{ $array['final'] = \number_format($this->final, 2, '.'); }
+		{ $array['final'] = \number_format($this->final, 2, '.', ''); }
 
 		if ( !empty($this->modalities) )
 		{
