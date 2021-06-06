@@ -212,7 +212,7 @@ class Pix
 		{ $array['txid'] = $this->tid; }
 
 		if ( !empty($this->amount) )
-		{ $array['valor'] = \number_format($this->amount, 2, '.'); }
+		{ $array['valor'] = \number_format($this->amount, 2, '.', ''); }
 
 		if ( !empty($this->processedAt) )
 		{ $array['horario'] = $this->processedAt->format(DateTime::RFC3339); }
@@ -222,9 +222,10 @@ class Pix
 
 		if ( !empty($this->refunds) )
 		{ 
-			$array['devolucoes'] = \array_map( function ( Refund $r ) {
-				return $r->export();
-			}, $this->refunds);
+			$array['devolucoes'] = [];
+
+			foreach ( $this->refunds as $r )
+			{ $array['devolucoes'][] = $r->export(); }
 		}
 
 		return $array;
@@ -241,7 +242,7 @@ class Pix
 	{
 		$importable = [
 			'endToEndId' => 'setE2eid',
-			'tid' => 'setTid',
+			'txid' => 'setTid',
 			'valor' => 'setAmount',
 			'horario' => 'setProcessedAt',
 			'infoPagador' => 'setInfo'

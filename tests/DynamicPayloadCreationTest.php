@@ -8,7 +8,7 @@ use Piggly\Pix\DynamicPayload;
 use Piggly\Pix\Utils\Cast;
 
 /**
- * @coversDefaultClass \Piggly\Pix\Parser
+ * @coversDefaultClass \Piggly\Pix\DynamicPayload
  */
 class DynamicPayloadCreationTest extends TestCase
 {

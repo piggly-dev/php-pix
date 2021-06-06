@@ -8,7 +8,7 @@ use Piggly\Pix\StaticPayload;
 use Piggly\Pix\Utils\Cast;
 
 /**
- * @coversDefaultClass \Piggly\Pix\Parser
+ * @coversDefaultClass \Piggly\Pix\StaticPayload
  */
 class StaticPayloadCreationTest extends TestCase
 {

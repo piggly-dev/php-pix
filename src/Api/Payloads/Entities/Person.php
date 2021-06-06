@@ -166,13 +166,15 @@ class Person
 	 */
 	public function setDocument ( string $document )
 	{
-		if ( Parser::validateCpf($document) )
+		$parsed = Parser::parseDocument($document);
+
+		if ( Parser::validateCpf($parsed) )
 		{ 
 			$this->document = $document; 
 			$this->documentType = 'cpf';
 			return $this; 
 		}
-		else if ( Parser::validateCnpj($document) )
+		else if ( Parser::validateCnpj($parsed) )
 		{ 
 			$this->document = $document; 
 			$this->documentType = 'cnpj';

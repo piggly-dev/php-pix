@@ -2,7 +2,7 @@
 namespace Piggly\Pix\Api\Payloads\Entities;
 
 use Exception;
-use Piggly\Pix\Api\Payloads\Entities\Concerns\UseExtra;
+use Piggly\Pix\Api\Payloads\Concerns\UseExtra;
 use Piggly\Pix\Exceptions\InvalidFieldException;
 use RuntimeException;
 
@@ -378,8 +378,15 @@ class DueAmountModality
 		foreach ( $importable as $field => $method )
 		{
 			if ( isset($data[$field]) )
-			{ $this->{$method}($data[$field]); }
+			{ 
+				$this->{$method}($data[$field]); 
+				unset($data[$field]);
+			}
 		}
+
+		// Import extra fields
+		foreach ( $data as $field => $value )
+		{ $this->addExtra($field, $value); }
 
 		return $this;
 	}

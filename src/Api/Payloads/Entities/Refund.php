@@ -144,11 +144,11 @@ class Refund
 	/**
 	 * Set date when return was requested.
 	 *
-	 * @param DateTime $requestedAt Date when return was requested.
+	 * @param DateTime|string $requestedAt Date when return was requested.
 	 * @since 2.0.0
 	 * @return self
 	 */
-	public function setRequestedAt ( DateTime $requestedAt )
+	public function setRequestedAt ( $requestedAt )
 	{ $this->requestedAt = $requestedAt instanceof DateTime ? $requestedAt : new DateTime($requestedAt); return $this; }
 
 	/**
@@ -272,7 +272,7 @@ class Refund
 		{ $array['rtrId'] = $this->rid; }
 
 		if ( !empty($this->amount) )
-		{ $array['valor'] = \number_format($this->amount, 2, '.'); }
+		{ $array['valor'] = \number_format($this->amount, 2, '.', ''); }
 
 		if ( !empty($this->status) )
 		{ $array['status'] = $this->status; }
@@ -307,7 +307,8 @@ class Refund
 			'id' => 'setId',
 			'rtrId' => 'setRid',
 			'valor' => 'setAmount',
-			'status' => 'setStatus'
+			'status' => 'setStatus',
+			'motivo' => 'setReason'
 		];
 
 		foreach ( $importable as $field => $method )
@@ -325,8 +326,8 @@ class Refund
 
 			foreach ( $importable as $field => $method )
 			{
-				if ( isset($data[$field]) )
-				{ $this->{$method}($data[$field]); }
+				if ( isset($data['horario'][$field]) )
+				{ $this->{$method}($data['horario'][$field]); }
 			}
 		}
 
