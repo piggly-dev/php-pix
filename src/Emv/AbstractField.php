@@ -145,10 +145,10 @@ abstract class AbstractField
 	{
 		$value = $this->getValue();
 
-		if ( empty($value) )
+		if ( \is_null($value) )
 		{ 
 			if ( $this->required ) 
-			{ throw new InvalidEmvFieldException($this->name, $value, 'Required'); }
+			{ throw new InvalidEmvFieldException($this->name??'Unknown', 'null', 'Required'); }
 			else 
 			{ return ''; } 
 		}
