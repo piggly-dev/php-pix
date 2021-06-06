@@ -16,6 +16,9 @@
             "Piggly\\Pix\\": "src"
         }
     },
+    "suggest": {
+        "piggly/php-api-client": "Recomentado para criar requisições HTTP seguras e dinâmicas para as API Pix junto com os Payloads padrões."
+    },
     "require": {
         "php": "^7.2 || ^8.0",
         "ext-gd": "*",

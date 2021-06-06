@@ -30,12 +30,12 @@ try
 		// ->applyValidCharacters()
 		// ->applyUppercase()
 		// ->applyEmailWhitespace()
-		->setPixKey($keyType, $keyValue)
-		->setMerchantName($merchantName)
-		->setMerchantCity($merchantCity)
 		->setAmount($amount)
 		->setTid($tid)
-		->setDescription('Descrição do Pix');
+		->setDescription('Descrição do Pix')
+		->setPixKey($keyType, $keyValue)
+		->setMerchantName($merchantName)
+		->setMerchantCity($merchantCity);
 
 	// Continue o código
 	
