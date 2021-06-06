@@ -2,6 +2,10 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/piggly/php-pix.svg?style=flat-square)](https://packagist.org/packages/piggly/php-pix) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE) 
 
+> SUPORTE AO PHP 8.0
+
+[Versão Atual](https://img.shields.io/badge/version-2.x.x-green) [PHP](https://img.shields.io/packagist/php-v/piggly/php-pix)
+
 O **Pix** é o mais novo método de pagamento eletrônico criado pelo **Banco Central do Brasil**. Você encontra todos os detalhes na [página oficial](https://www.bcb.gov.br/estabilidadefinanceira/pix) do Pix. Saiba mais como ele funciona e como nossa biblioteca trabalha [clicando aqui](https://github.com/piggly-dev/php-pix/wiki/04.-Pix).
 
 Essa biblioteca foi criada para ser utilizada principalmente com o plugin de **Woocommerce** [Pix por Piggly](https://wordpress.org/plugins/pix-por-piggly/). Mas, pode ser utilizada em qualquer sistema onde seja necessário a criação de payloads, códigos e QRCodes Pix. Afinal, ela foi criada para otimizar o processo de trabalho com os códigos Pix. Com ela, você poderá:
@@ -11,29 +15,37 @@ Essa biblioteca foi criada para ser utilizada principalmente com o plugin de **W
 * Ler códigos Pix importando os dados Pix;
 * Criar payloads de Cobranças e Devoluções para interagir com as APIs Pix;
 * Usar uma base de comunicação com a Api para organizar seus códigos;
-* Gerar códigos compatíveis com o Pix versão 2.2.1, veja mais detalhes [clicando aqui](https://www.bcb.gov.br/content/estabilidadefinanceira/pix/Regulamento_Pix/II-ManualdePadroesparaIniciacaodoPix.pdf).
+* Gerar códigos compatíveis com a última versão do Pix.
 
 Leia sobre a solução de problemas [clicando aqui](https://github.com/piggly-dev/php-pix/wiki/09.-Solu%C3%A7%C3%A3o-de-Problemas) caso suas chaves Pix sejam inválidas. E, não deixe de conferir nossa [documentação completa](https://github.com/piggly-dev/php-pix/wiki).
-
-> Confira também nossa micro interface pix em [piggly/php-pix-app](https://github.com/piggly-dev/php-pix-app).
 
 > Se você apreciar a função desta biblioteca e quiser apoiar este trabalho, sinta-se livre para fazer qualquer doação para a chave aleatória Pix `aae2196f-5f93-46e4-89e6-73bf4138427b` ❤.
 
 ## Instalação
 
-Essa biblioteca pode ser instalada via **Composer** com `composer require piggly/php-pix`;
+### Composer
 
-### Atualização da versão 1.2.1
+* No terminal, dentro da sua pasta do projeto, digite `composer require piggly/php-pix`;
+* Não esqueça de iniciar o composer incluindo o arquivo `require_once('vendor/autoload.php);` na base do código.
 
-Eba! Finalmente a Api Pix foi implementada ou, pelo menos, a base dela. Como recebemos muitas solicitações via e-mail [dev@piggly.com.br](mailto:dev@piggly.com.br) que gostaram da forma como nós programamos, decidimos fazer esse lançamento. Agora você poderá utilizar nossa estrutura para melhorar seu processo de comunicação com qualquer Api Pix. Veja mais detalhes na [documentação](https://github.com/piggly-dev/php-pix/wiki).
+### Instalação Manual
 
-### Atualização das versões < 1.1.* para 1.2.0
+* Baixe ou clone esse repositório com `git clone https://github.com/piggly-dev/php-pix.git`;
+* Depois, vá para a pasta `/path/to/php-pix` e dê o comando `composer install` para instalar todas as dependências.
+* Adicione o `autoload` do composer na base do seu projeto `require_once('/path/to/php-pix/vendor/autoload.php);`.
 
-Veja todos os detalhes [clicando aqui](https://github.com/piggly-dev/php-pix/releases/tag/1.2.0).
+## Dependências
 
-### Atualização das versões 1.0.* para 1.1.0
+Essa bibliotecca possuí as seguintes dependências:
 
-Veja todos os detalhes [clicando aqui](https://github.com/piggly-dev/php-pix/releases/tag/1.1.0).
+* [Extensão GD do PHP](https://www.php.net/manual/pt_BR/book.image.php) para gerar QR Codes;
+* PHP +7.2 ou PHP +8.0.
+
+### Atualização para a versão 2.0.0
+
+Muitas coisas mudaram, além do suporte ao **PHP 8** os campos EMV foram otimizados e expandidos. Além disso, as requisições para APIs foram removidas e os payloads para as APIs foram reformulados. Recomendamos ler a documentação e verificar tudo o que mudou.
+
+Para realizar as requisições da api, recomendamos a biblioteca [piggly/php-api-client](https://github.com/piggly-dev/php-api-client), ela foi desenvolvida para ser flexível e muito mais robusta que a solução anterior utilizada na versão 1.x.x.
 
 ## Como utilizar?
 
