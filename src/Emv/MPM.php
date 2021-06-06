@@ -116,7 +116,7 @@ class MPM
 		foreach ( $emvs as $field )
 		{ $code .= $field->export(); }
 
-		$code .= '6304'.static::CRC16($code);
+		$code .= '6304'.static::CRC16($code.'6304');
 
 		$this->code = $code;
 		return $this->code;
@@ -136,11 +136,11 @@ class MPM
 		$response   = 0xFFFF;
 
 		// Checksum
-		if ( ( $length = strlen($payload) ) > 0 ) 
+		if ( ( $length = \strlen($payload) ) > 0 ) 
 		{
 			for ( $offset = 0; $offset < $length; $offset++ ) 
 			{
-				$response ^= ( ord( $payload[$offset] ) << 8 );
+				$response ^= ( \ord( $payload[$offset] ) << 8 );
 				
 				for ( $bitwise = 0; $bitwise < 8; $bitwise++ ) 
 				{
@@ -153,6 +153,6 @@ class MPM
 	  }
 
 	  // CRC16 calculated
-	  return \strtoupper(\dechex($response));
+	  return \strtoupper(\str_pad(\dechex($response), 4, '0', \STR_PAD_LEFT));
 	}
 }

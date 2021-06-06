@@ -41,12 +41,15 @@ class ValidStaticPixTest extends TestCase
 	 * @covers MPM::CRC16
 	 * @dataProvider dataCRC
 	 * @test Expecting positive assertion.
-	 * @param string $expected Expected CRC.
 	 * @param string $actual String to generate.
 	 * @return boolean
 	 */
-	public function isCRCValid ( string $expected, string $actual )
-	{ $this->assertEquals($expected, MPM::CRC16($actual)); }
+	public function isCRCValid ( string $actual )
+	{ 
+		$expected = \substr($actual, -4);
+		$actual   = \str_replace($expected, '', $actual);
+		$this->assertEquals($expected, MPM::CRC16($actual)); 
+	}
 
 	/**
 	 * A list with valid pix created.
@@ -130,25 +133,21 @@ class ValidStaticPixTest extends TestCase
 
 		// BANCO INTER (SEM TID)
 		$pix[] = [
-			'4EED',
-			'00020101021126860014br.gov.bcb.pix0136285fb964-0087-4a94-851a-5a161ed8888a0224Solicitacao de pagamento52040000530398654041.015802BR5913STUDIO PIGGLY6007Uberaba62070503***',
+			'00020101021126860014br.gov.bcb.pix0136285fb964-0087-4a94-851a-5a161ed8888a0224Solicitacao de pagamento52040000530398654041.015802BR5913STUDIO PIGGLY6007Uberaba62070503***63044EED',
 		];
 		// BANCO INTER (COM TID)
 		$pix[] = [
-			'0665',
-			'00020101021126790014br.gov.bcb.pix0136285fb964-0087-4a94-851a-5a161ed8888a0217DC ACENTUACAO 00152040000530398654041.025802BR5913STUDIO PIGGLY6007Uberaba62090505TX102',
+			'00020101021126790014br.gov.bcb.pix0136285fb964-0087-4a94-851a-5a161ed8888a0217DC ACENTUACAO 00152040000530398654041.025802BR5913STUDIO PIGGLY6007Uberaba62090505TX10263040665',
 		];
 
 		// NUBANK (SEM TID)
 		$pix[] = [
-			'56D6',
-			'00020126580014BR.GOV.BCB.PIX0136aae2196f-5f93-46e4-89e6-73bf4138427b52040000530398654041.015802BR5922Caique Monteiro Araujo6009SAO PAULO61080540900062070503***',
+			'00020126580014BR.GOV.BCB.PIX0136aae2196f-5f93-46e4-89e6-73bf4138427b52040000530398654041.015802BR5922Caique Monteiro Araujo6009SAO PAULO61080540900062070503***630456D6',
 		];
 
 		// NUBANK (COM TID)
 		$pix[] = [
-			'F4DB',
-			'00020126580014BR.GOV.BCB.PIX0136aae2196f-5f93-46e4-89e6-73bf4138427b52040000530398654041.025802BR5922Caique Monteiro Araujo6009SAO PAULO61080540900062090505TX1026304'
+			'00020126580014BR.GOV.BCB.PIX0136aae2196f-5f93-46e4-89e6-73bf4138427b52040000530398654041.025802BR5922Caique Monteiro Araujo6009SAO PAULO61080540900062090505TX1026304F4DB'
 		];
 
 		return $pix;
