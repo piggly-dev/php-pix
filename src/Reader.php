@@ -159,6 +159,13 @@ class Reader
 		else if ( $poi == 12 )
 		{ return (new DynamicPayload())->changeMpm($mpm); }
 
+		$url = $mpm->getEmv('26')->getField('25')->getValue();
+
+		if ( empty($url) )
+		{ return (new StaticPayload())->changeMpm($mpm); }
+		else
+		{ return (new DynamicPayload())->changeMpm($mpm); }
+
 		// Cannot determine the Point of Initiation Method
 		throw new InvalidPixCodeException($this->raw);
 	}

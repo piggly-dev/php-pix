@@ -49,8 +49,6 @@ class StaticPayload extends AbstractPayload
 	 */
 	public function changeMpm ( MPM $mpm )
 	{
-		// Transaction Amount is Required
-		$mpm->getEmv('54')->required(true);
 		// Pix Key is Required
 		$this->mpm->getEmv('26')->getField('01')->required(true);
 		// Remove Payment URL
