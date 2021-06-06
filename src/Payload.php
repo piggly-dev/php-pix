@@ -616,6 +616,7 @@ class Payload
 	 * Get the current CRC16 by following standard values provieded by BACEN.
 	 * 
 	 * @since 1.0.0
+	 * @since 1.2.8 Pad string with zeros at left.
 	 * @param string $payload The full payload.
 	 * @return string
 	 */
@@ -646,7 +647,7 @@ class Payload
 	  }
 
 	  // CRC16 calculated
-	  return self::ID_CRC16.'04' . strtoupper( dechex( $response ) );
+	  return self::ID_CRC16.'04' . strtoupper( \str_pad( dechex( $response ), 4, '0', \STR_PAD_LEFT ) );
 	}
 
 	/**
