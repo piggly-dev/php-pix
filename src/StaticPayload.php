@@ -121,6 +121,7 @@ class StaticPayload extends AbstractPayload
 	 * 
 	 * @param string|null $tid Pix transaction id.
 	 * @since 2.0.0
+	 * @since 2.0.1 Fix remove of * char.
 	 * @return self
 	 */
 	public function setTid ( ?string $tid )
@@ -130,7 +131,7 @@ class StaticPayload extends AbstractPayload
 		if ( is_null( $tid ) )
 		{ $_tid = Parser::getRandom(); }
 		else 
-		{ $_tid = preg_replace('/[^A-Za-z0-9]+/', '', $tid);}
+		{ $_tid = preg_replace('/[^A-Za-z0-9\*]+/', '', $tid);}
 				
 		$this->mpm->getEmv('62')->getField('05')->setValue($_tid);
 		return $this;
