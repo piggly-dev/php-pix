@@ -66,8 +66,14 @@ class StaticPayloadCreationTest extends TestCase
 		for ( $i = 0; $i < 100; $i++ )
 		{
 			$pix     = new StaticPayload();
-			$pixData = [ 'AMOUNT' => $faker->randomFloat(2) ];
-			$pix->setAmount($pixData['AMOUNT']);
+			$pixData = ['AMOUNT' => 0];
+
+			// Amount
+			if ( $faker->boolean() ) 
+			{
+				$pixData['AMOUNT'] = $faker->randomFloat(2);
+				$pix->setAmount($pixData['AMOUNT']);
+			}
 
 			// Key
 			$pixData = array_merge($pixData, $this->getRandomKey($faker));
