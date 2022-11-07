@@ -57,7 +57,7 @@ class MPM
 
 		$this->emvs['26']
 			->addField(new Field('00', 'Globally Unique Identifier', 32, true, 'br.gov.bcb.pix'))
-			->addField(new Field('01', 'Pix Key', 36, false))
+			->addField(new Field('01', 'Pix Key', 77, false))
 			->addField(new Field('02', 'Payment Description', 40, false))
 			->addField(new Field('25', 'Payment URL', 77, false));
 
