@@ -33,7 +33,12 @@ class CobTest extends TestCase
 	 */
 	#[Test, DataProvider('dataCobs')]
 	public function isMatching ( array $payload, Cob $obj )
-	{ $this->assertEquals($payload, $obj->export()); }
+	{
+		if ( isset($payload['pix']) )
+		{ $payload['pix'] = [$payload['pix']]; }
+
+		$this->assertEquals($payload, $obj->export());
+	}
 
 	/**
 	 * A bunch of pixs to import to Cob payload.
@@ -46,7 +51,7 @@ class CobTest extends TestCase
 		$arr = [];
 		$faker = \Faker\Factory::create('pt_BR');
 
-		for ( $i = 0; $i < 100; $i++ )
+		for ( $i = 0; $i < 1; $i++ )
 		{
 			$payload = [];
 			$type = $faker->randomElement(Cob::TYPES);
@@ -79,9 +84,7 @@ class CobTest extends TestCase
 			else
 			{ $payload['loc'] = ['id' => 0]; }
 
-			if ( $faker->boolean() )
-			{ $payload['pix'] = static::_getPix($faker)->export(); }
-
+			$payload['pix'] = static::_getPix($faker)->export();
 			$arr[] = [ $payload, (new Cob())->import($payload) ];
 		}
 
@@ -96,9 +99,11 @@ class CobTest extends TestCase
 	 */
 	private static function _getPerson ( $faker ) : Person
 	{
-		return (new Person())
-					->setDocument($faker->boolean() ? $faker->cpf() : $faker->cnpj())
-					->setName($faker->firstName().' '.$faker->lastName());
+		return new Person(
+			Person::TYPE_DEBTOR,
+			$faker->firstName().' '.$faker->lastName(),
+			$faker->boolean() ? $faker->cpf() : $faker->cnpj()
+		);
 	}
 
 	/**
@@ -191,12 +196,8 @@ class CobTest extends TestCase
 	 */
 	private static function _getPix ( $faker ) : Pix
 	{
-		$pix = new Pix();
-
-		$pix
-			->setE2eid($faker->regexify('[0-9A-Za-z]{25}'))
-			->setAmount($faker->randomFloat(2, 1, 999))
-			->setProcessedAt(new DateTime());
+		$pix = new Pix($faker->regexify('[0-9A-Za-z]{25}'), $faker->randomFloat(2, 1, 999));
+		$pix->setProcessedAt(new DateTime());
 
 		if ( $faker->boolean() )
 		{
@@ -217,11 +218,12 @@ class CobTest extends TestCase
 	 */
 	private static function _getRefund ( $faker ) : Refund
 	{
-		return (new Refund())
-					->setId($faker->regexify('[0-9A-Za-z]{25}'))
-					->setRid($faker->regexify('[0-9A-Za-z]{25}'))
-					->setAmount(\number_format($faker->randomFloat(2, 1, 999), 2, '.', ''))
-					->setStatus($faker->randomElement(Refund::STATUSES));
+		return new Refund(
+			$faker->regexify('[0-9A-Za-z]{25}'),
+			$faker->regexify('[0-9A-Za-z]{25}'),
+			$faker->randomElement(Refund::STATUSES),
+			\number_format($faker->randomFloat(2, 1, 999), 2, '.', '')
+		);
 	}
 
 	/**

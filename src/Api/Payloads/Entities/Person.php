@@ -136,7 +136,7 @@ class Person
 	 * @since 3.0.0 Expect name and document as param.
 	 * @return self
 	 */
-	public function __construct ( string $type = self::TYPE_DEBTOR, string $name, string $document )
+	public function __construct ( string $type, string $name, string $document )
 	{
 		$this->setType($type, $name, $document);
 	}

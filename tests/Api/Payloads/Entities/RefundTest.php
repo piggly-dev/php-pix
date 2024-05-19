@@ -58,7 +58,7 @@ class RefundTest extends TestCase
 	public function throwStatusException ()
 	{
 		$this->expectException(InvalidFieldException::class);
-		(new Refund())->setStatus('unknown');
+		(new Refund('1', '2', Refund::STATUS_PROCESSING, 10))->setStatus('unknown');
 	}
 
 	/**
@@ -98,7 +98,7 @@ class RefundTest extends TestCase
 				{ unset($payload['horario']); }
 			}
 
-			$arr[] = [ $payload, (new Refund())->import($payload) ];
+			$arr[] = [ $payload, (new Refund($payload['id'], $payload['rtrId'], $payload['status'], $payload['valor']))->import($payload) ];
 		}
 
 		return $arr;
@@ -121,7 +121,12 @@ class RefundTest extends TestCase
 			$requestAt = $faker->dateTimeBetween('-1 week', '+1 week');
 			$paidAt = $faker->dateTimeBetween('-1 week', '+1 week');
 
-			$refund = new Refund();
+			$refund = new Refund(
+				$faker->regexify('[0-9A-Za-z]{25}'),
+				$faker->regexify('[0-9A-Za-z]{25}'),
+				$faker->randomElement(Refund::STATUSES),
+				$amount
+			);
 
 			$refund
 				->setAmount(\number_format($amount, 2, '.', ''))

@@ -211,7 +211,7 @@ class Location
 
 		foreach ( $importable as $field => $method )
 		{
-			if ( empty($data[$field]) === false )
+			if ( isset($data[$field]) || empty($data[$field]) === false )
 			{ $this->{$method}($data[$field]); }
 		}
 

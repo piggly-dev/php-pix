@@ -55,16 +55,15 @@ class PersonTest extends TestCase
 
 		for ( $i = 0; $i < 100; $i++ )
 		{
-			$payload = [];
+			$array = [
+				'nome' => $faker->firstName().' '.$faker->lastName()
+			];
 
 			$array['cpf'] = $faker->cpf();
 
 			// Random change to CNPJ
 			if ( $faker->boolean() )
 			{ $array['cnpj'] = $faker->cnpj(); unset($array['cpf']); }
-
-			if ( $faker->boolean() )
-			{ $array['nome'] = $faker->firstName().' '.$faker->lastName(); }
 
 			if ( $faker->boolean() )
 			{ $array['nomeFantasia'] = $faker->company(); }
@@ -84,7 +83,7 @@ class PersonTest extends TestCase
 			if ( $faker->boolean() )
 			{ $array['email'] = $faker->email(); }
 
-			$arr[] = [ $payload, (new Person())->import($payload) ];
+			$arr[] = [ $array, (new Person(Person::TYPE_DEBTOR, $array['nome'], $array['cpf'] ?? $array['cnpj']))->import($array) ];
 		}
 
 		return $arr;
@@ -111,8 +110,11 @@ class PersonTest extends TestCase
 			else
 			{ $doc = $faker->cnpj(); $docType = 'cnpj'; }
 
-			$person = new Person();
-			$person->setDocument($doc);
+			$person = new Person(
+				Person::TYPE_DEBTOR,
+				$faker->firstName().' '.$faker->lastName(),
+				$doc
+			);
 
 			$arr[] = [ $docType, $person->getDocumentType() ];
 		}

@@ -162,7 +162,7 @@ class Cob
 	 * Collection of pix related to cob.
 	 *
 	 * @since 3.0.0
-	 * @var array
+	 * @var array<Pix>
 	 */
 	protected $pixes = [];
 
@@ -288,7 +288,10 @@ class Cob
 	 * @return self
 	 */
 	public function setPix ( Pix $pix )
-	{ $this->pix = $pix; return $this;	}
+	{
+		$this->pix = $pix;
+		\array_unshift($this->pixes, $pix);
+	}
 
 	/**
 	 * Set the cob pix key.
@@ -486,7 +489,7 @@ class Cob
 	public function addPix ( $pix )
 	{
 		$pix = $pix instanceof Pix ? $pix : (new Pix($pix['endToEndId'], $pix['valor']))->import($pix);
-		$this->pixes[$pix['endToEndId']] = $pix;
+		$this->pixes[$pix->getE2eid()] = $pix;
 		return $this;
 	}
 
@@ -605,7 +608,7 @@ class Cob
 		{ $this->setPixKey($response['chave']); }
 
 		if ( empty($response['pixCopiaECola']) === false )
-		{ $this->setPixKey($response['pixCopiaECola']); }
+		{ $this->setPixCopyPaste($response['pixCopiaECola']); }
 
 		if ( empty($response['solicitacaoPagador']) === false )
 		{ $this->setRequestToDebtor($response['solicitacaoPagador']); }
@@ -621,7 +624,7 @@ class Cob
 		{ $this->setCalendar((new Calendar())->import($response['calendario'])); }
 
 		if ( empty($response['devedor']) === false && \is_array($response['devedor']) )
-		{ $this->setDebtor((new Person(Person::TYPE_DEBTOR, $response['devedor']['name'], $response['devedor']['cpf'] ?? $response['devedor']['cnpj']))->import($response['devedor'])); }
+		{ $this->setDebtor((new Person(Person::TYPE_DEBTOR, $response['devedor']['nome'], $response['devedor']['cpf'] ?? $response['devedor']['cnpj']))->import($response['devedor'])); }
 
 		if ( empty($response['loc']) === false )
 		{ $this->setLocation((new Location())->import($response['loc'])); }
@@ -633,14 +636,14 @@ class Cob
 		if ( empty($response['txid']) === false )
 		{ $this->setTid($response['txid']); }
 
-		if ( empty($response['revisao']) === false )
+		if ( isset($response['revisao']) || empty($response['revisao']) === false )
 		{ $this->setRevision(\intval($response['revisao'])); }
 
 		if ( empty($response['status']) === false )
 		{ $this->setStatus($response['status']); }
 
 		if ( empty($response['recebedor']) === false && \is_array($response['recebedor']) )
-		{ $this->setReceiver((new Person(Person::TYPE_RECEIVER, $response['recebedor']['name'], $response['recebedor']['cpf'] ?? $response['recebedor']['cnpj']))->import($response['recebedor'])); }
+		{ $this->setReceiver((new Person(Person::TYPE_RECEIVER, $response['recebedor']['nome'], $response['recebedor']['cpf'] ?? $response['recebedor']['cnpj']))->import($response['recebedor'])); }
 
 		if ( empty($response['pix']) === false && \is_array($response['pix']) )
 		{
@@ -648,10 +651,6 @@ class Cob
 
 			foreach ( $pixes as $pix )
 			{ $this->addPix($pix); }
-
-			if ( empty($this->pixes[0]) === false ) {
-				$this->setPix($this->pixes[0]);
-			}
 		}
 
 		return $this;

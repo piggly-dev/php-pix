@@ -81,7 +81,7 @@ class PixTest extends TestCase
 				{ $payload['devolucoes'][] = static::_getRefund($faker)->export(); }
 			}
 
-			$arr[] = [ $payload, (new Pix())->import($payload) ];
+			$arr[] = [ $payload, (new Pix($payload['endToEndId'], $payload['valor']))->import($payload) ];
 		}
 
 		return $arr;
@@ -104,10 +104,9 @@ class PixTest extends TestCase
 			$processedAt = $faker->dateTimeBetween('-1 week', '+1 week');
 			$refund = static::_getRefund($faker);
 
-			$pix = new Pix();
+			$pix = new Pix($faker->regexify('[0-9A-Za-z]{25}'), $amount);
 
 			$pix
-				->setAmount(\number_format($amount, 2, '.', ''))
 				->setProcessedAt($processedAt->format(DateTime::RFC3339))
 				->addRefund($refund->export());
 
@@ -127,10 +126,11 @@ class PixTest extends TestCase
 	 */
 	private static function _getRefund ( $faker ) : Refund
 	{
-		return (new Refund())
-					->setId($faker->regexify('[0-9A-Za-z]{25}'))
-					->setRid($faker->regexify('[0-9A-Za-z]{25}'))
-					->setAmount(\number_format($faker->randomFloat(2, 1, 999), 2, '.', ''))
-					->setStatus($faker->randomElement(Refund::STATUSES));
+		return new Refund(
+			$faker->regexify('[0-9A-Za-z]{25}'),
+			$faker->regexify('[0-9A-Za-z]{25}'),
+			$faker->randomElement(Refund::STATUSES),
+			\number_format($faker->randomFloat(2, 1, 999), 2, '.', '')
+		);
 	}
 }
