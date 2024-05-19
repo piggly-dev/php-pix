@@ -2,6 +2,7 @@
 namespace Piggly\Pix\Api\Payloads\Entities;
 
 use DateTime;
+use Piggly\Pix\Utils\Helper;
 
 /**
  * Calendar entity to Cob payload.
@@ -196,20 +197,27 @@ class Calendar
 	 */
 	public function import ( array $data )
 	{
-		$importable = [
+		Helper::fill($data, $this, [
 			'criacao' => 'setCreatedAt',
 			'apresentacao' => 'setPresentedAt',
 			'expiracao' => 'setExpiresIn',
 			'dataDeVencimento' => 'setDueDate',
 			'validadeAposVencimento' => 'setExpirationAfter'
-		];
-
-		foreach ( $importable as $field => $method )
-		{
-			if ( empty($data[$field]) === false )
-			{ $this->{$method}($data[$field]); }
-		}
+		]);
 
 		return $this;
+	}
+
+	/**
+	 * Create a new entity.
+	 *
+	 * @param array $data
+	 * @since 3.0.0
+	 * @return Calendar
+	 */
+	public static function create ( array $data )
+	{
+		$e = new Calendar();
+		return $e->import($data);
 	}
 }

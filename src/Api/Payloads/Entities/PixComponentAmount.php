@@ -1,6 +1,7 @@
 <?php
 namespace Piggly\Pix\Api\Payloads\Entities;
 
+use Piggly\Pix\Utils\Helper;
 use RuntimeException;
 
 /**
@@ -247,18 +248,26 @@ class PixComponentAmount
 	 */
 	public function import ( array $data )
 	{
-		$importable = [
+		Helper::fill($data, $this, [
 			'modalidadeAgente' => 'setModalityAgent',
 			'prestadorDoServicoDeSaque' => 'setProviderOfWithdrawalService'
-		];
-
-		foreach ( $importable as $field => $method )
-		{
-			if ( empty($data[$field]) === false )
-			{ $this->{$method}($data[$field]); }
-		}
+		]);
 
 		return $this;
+	}
+
+	/**
+	 * Create a new entity.
+	 *
+	 * @param string $type
+	 * @param array $data
+	 * @since 3.0.0
+	 * @return PixComponentAmount
+	 */
+	public static function create ( string $type, array $data )
+	{
+		$e = new PixComponentAmount($type, $data['valor']);
+		return $e->import($data);
 	}
 
 	/**

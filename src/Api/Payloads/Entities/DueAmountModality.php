@@ -4,6 +4,7 @@ namespace Piggly\Pix\Api\Payloads\Entities;
 use Exception;
 use Piggly\Pix\Api\Payloads\Concerns\UseExtra;
 use Piggly\Pix\Exceptions\InvalidFieldException;
+use Piggly\Pix\Utils\Helper;
 use RuntimeException;
 
 /**
@@ -370,25 +371,30 @@ class DueAmountModality
 	 */
 	public function import ( array $data )
 	{
-		$importable = [
+		$rest = Helper::fill($data, $this, [
 			'modalidade' => 'setId',
 			'valorPerc' => 'setAmount'
-		];
-
-		foreach ( $importable as $field => $method )
-		{
-			if ( empty($data[$field]) === false )
-			{
-				$this->{$method}($data[$field]);
-				unset($data[$field]);
-			}
-		}
+		]);
 
 		// Import extra fields
-		foreach ( $data as $field => $value )
+		foreach ( $rest as $field => $value )
 		{ $this->addExtra($field, $value); }
 
 		return $this;
+	}
+
+	/**
+	 * Create a new entity.
+	 *
+	 * @param string $modality
+	 * @param array $data
+	 * @since 3.0.0
+	 * @return DueAmountModality
+	 */
+	public static function create ( string $modality, array $data )
+	{
+		$e = new DueAmountModality($modality);
+		return $e->import($data);
 	}
 
 	/**

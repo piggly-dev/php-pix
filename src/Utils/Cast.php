@@ -1,12 +1,11 @@
 <?php
 namespace Piggly\Pix\Utils;
 
-use Piggly\Pix\Exceptions\EmvIdIsRequiredException;
 use Piggly\Pix\Exceptions\InvalidEmvFieldException;
 
 /**
  * Cast data to another format.
- * 
+ *
  * @package \Piggly\Pix
  * @subpackage \Piggly\Pix\Utils
  * @version 2.0.0
@@ -22,7 +21,7 @@ class Cast
 	/**
 	 * Replace acents and remove any invalid char
 	 * from $str.
-	 * 
+	 *
 	 * By default, allow only chars: A-Z, a-z, 0-9, (space) and -.
 	 * When $allowDigits is set to FALSE, will allow only the
 	 * following chars: A-Z, a-z, and (space).
@@ -44,7 +43,7 @@ class Cast
 
 	/**
 	 * Cut $str length to $maxLength.
-	 * 
+	 *
 	 * When $throw is set to TRUE, then will throw
 	 * an exception if $str length is greater than
 	 * $maxLength instead cutting.

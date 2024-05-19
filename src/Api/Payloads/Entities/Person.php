@@ -4,6 +4,7 @@ namespace Piggly\Pix\Api\Payloads\Entities;
 use Exception;
 use Piggly\Pix\Exceptions\InvalidFieldException;
 use Piggly\Pix\Parser;
+use Piggly\Pix\Utils\Helper;
 use RuntimeException;
 
 /**
@@ -415,22 +416,30 @@ class Person
 	 */
 	public function import ( array $data )
 	{
-		$importable = [
+		Helper::fill($data, $this, [
 			'nomeFantasia' => 'setFantasyName',
 			'logradouro' => 'setStreetAddress',
 			'cidade' => 'setCity',
 			'cep' => 'setZipCode',
 			'uf' => 'setState',
 			'email' => 'setEmail'
-		];
-
-		foreach ( $importable as $field => $method )
-		{
-			if ( empty($data[$field]) === false )
-			{ $this->{$method}($data[$field]); }
-		}
+		]);
 
 		return $this;
+	}
+
+	/**
+	 * Create a new entity.
+	 *
+	 * @param string $type
+	 * @param array $data
+	 * @since 3.0.0
+	 * @return Person
+	 */
+	public static function create ( string $type, array $data )
+	{
+		$e = new Person($type, $data['name'], $data['cpf'] ?? $data['cnpj']);
+		return $e->import($data);
 	}
 
 	/**

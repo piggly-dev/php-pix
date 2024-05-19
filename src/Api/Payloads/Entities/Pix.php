@@ -2,6 +2,7 @@
 namespace Piggly\Pix\Api\Payloads\Entities;
 
 use DateTime;
+use Piggly\Pix\Utils\Helper;
 
 /**
  * Pix entity to Cob payload.
@@ -304,17 +305,11 @@ class Pix
 	 */
 	public function import ( array $data )
 	{
-		$importable = [
+		Helper::fill($data, $this, [
 			'txid' => 'setTid',
 			'horario' => 'setProcessedAt',
 			'infoPagador' => 'setInfo'
-		];
-
-		foreach ( $importable as $field => $method )
-		{
-			if ( empty($data[$field]) === false )
-			{ $this->{$method}($data[$field]); }
-		}
+		]);
 
 		if ( empty($data['devolucoes']) === false && \is_array($data['devolucoes']) )
 		{
@@ -329,5 +324,18 @@ class Pix
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Create a new entity.
+	 *
+	 * @param array $data
+	 * @since 3.0.0
+	 * @return Pix
+	 */
+	public static function create ( array $data )
+	{
+		$e = new Pix($data['endToEndId'], $data['valor']);
+		return $e->import($data);
 	}
 }

@@ -5,6 +5,7 @@ use DateTime;
 use Exception;
 use Piggly\Pix\Api\Payloads\Cob;
 use Piggly\Pix\Exceptions\InvalidFieldException;
+use Piggly\Pix\Utils\Helper;
 
 /**
  * Location entity to Cob payload.
@@ -201,20 +202,28 @@ class Location
 	 */
 	public function import ( array $data )
 	{
-		$importable = [
+		Helper::fill($data, $this, [
 			'id' => 'setId',
 			'txid' => 'setTid',
 			'location' => 'setLocation',
 			'tipoCob' => 'setType',
 			'criacao' => 'setCreatedAt'
-		];
-
-		foreach ( $importable as $field => $method )
-		{
-			if ( isset($data[$field]) || empty($data[$field]) === false )
-			{ $this->{$method}($data[$field]); }
-		}
+		]);
 
 		return $this;
+	}
+
+	/**
+	 * Create a new entity.
+	 *
+	 * @param string $modality
+	 * @param array $data
+	 * @since 3.0.0
+	 * @return Location
+	 */
+	public static function create ( array $data )
+	{
+		$e = new Location();
+		return $e->import($data);
 	}
 }

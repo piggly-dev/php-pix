@@ -1,10 +1,9 @@
 <?php
 namespace Piggly\Pix\Api\Payloads\Entities;
 
-use DateTime;
 use Exception;
 use Piggly\Pix\Exceptions\InvalidFieldException;
-use RuntimeException;
+use Piggly\Pix\Utils\Helper;
 
 /**
  * Requested refund entity to Pix entity.
@@ -154,17 +153,26 @@ class RequestedRefund
 	 */
 	public function import ( array $data )
 	{
-		$importable = [
+		Helper::fill($data, $this, [
 			'descricao' => 'setDescription',
 			'natureza' => 'setNature'
-		];
-
-		foreach ( $importable as $field => $method )
-		{
-			if ( empty($data[$field]) === false )
-			{ $this->{$method}($data[$field]); }
-		}
+		]);
 
 		return $this;
 	}
+
+	/**
+	 * Create a new entity.
+	 *
+	 * @param string $type
+	 * @param array $data
+	 * @since 3.0.0
+	 * @return RequestedRefund
+	 */
+	public static function create ( array $data )
+	{
+		$e = new RequestedRefund($data['valor']);
+		return $e->import($data);
+	}
+
 }

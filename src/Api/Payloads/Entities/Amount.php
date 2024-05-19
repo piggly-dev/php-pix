@@ -1,6 +1,8 @@
 <?php
 namespace Piggly\Pix\Api\Payloads\Entities;
 
+use Piggly\Pix\Utils\Helper;
+
 /**
  * Amount entity to Cob payload.
  *
@@ -135,12 +137,12 @@ class Amount
 	/**
 	 * Set if payer can change amount.
 	 *
-	 * @param bool $changeability
+	 * @param bool|int|string $changeability
 	 * @since 3.0.0
 	 * @return self
 	 */
-	public function payerCanChangeAmount ( bool $changeability )
-	{ $this->changeability = $changeability; return $this; }
+	public function payerCanChangeAmount ( $changeability )
+	{ $this->changeability = \boolval($changeability); return $this; }
 
 
 	/**
@@ -186,9 +188,11 @@ class Amount
 	public function export () : array
 	{
 		$array = [
-			'original' => \number_format($this->original, 2, '.', ''),
-			'modalidadeAlteracao' => $this->changeability ? 1 : 0
+			'original' => \number_format($this->original, 2, '.', '')
 		];
+
+		if ( $this->changeability )
+		{ $array['modalidadeAlteracao'] = 1; }
 
 		if ( !empty($this->final) )
 		{ $array['final'] = \number_format($this->final, 2, '.', ''); }
@@ -218,32 +222,40 @@ class Amount
 	 */
 	public function import ( array $data )
 	{
-		$importable = [
+		Helper::fill($data, $this, [
 			'original' => 'setOriginal',
 			'final' => 'setFinal',
-		];
-
-		foreach ( $importable as $field => $method )
-		{
-			if ( empty($data[$field]) === false )
-			{ $this->{$method}($data[$field]); }
-		}
+			'modalidadeAlteracao' => 'payerCanChangeAmount'
+		]);
 
 		if ( isset($data['modalidadeAlteracao']) )
 		{ $this->payerCanChangeAmount(\boolval($data['modalidadeAlteracao'])); }
 
 		foreach ( DueAmountModality::MODALITIES as $modality )
 		{
-			if ( empty($data[$modality]) === false )
+			if ( Helper::shouldBeArray($data[$modality] ?? null) )
 			{ $this->addModality((new DueAmountModality($modality))->import($data[$modality])); }
 		}
 
-		if ( empty($data['retirada']) === false && \is_array($data['retirada']) )
+		if ( Helper::shouldBeArray($data['retirada'] ?? null) )
 		{
 			foreach ( $data['retirada'] as $type => $componenteValor )
 			{ $this->addWithdraw($type, $componenteValor); }
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Create a new entity.
+	 *
+	 * @param array $data
+	 * @since 3.0.0
+	 * @return Amount
+	 */
+	public static function create ( array $data )
+	{
+		$e = new Amount();
+		return $e->import($data);
 	}
 }
