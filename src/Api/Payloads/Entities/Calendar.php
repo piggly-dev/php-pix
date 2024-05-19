@@ -5,7 +5,7 @@ use DateTime;
 
 /**
  * Calendar entity to Cob payload.
- * 
+ *
  * @package \Piggly\Pix
  * @subpackage \Piggly\Pix\Api\Payloads\Entities
  * @version 2.0.0
@@ -20,56 +20,57 @@ class Calendar
 {
 	/**
 	 * Cob created at.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var DateTime
+	 * @var DateTime|null
 	 */
-	protected $createdAt;
+	protected $createdAt = null;
 
 	/**
 	 * Cob presented at.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var DateTime
+	 * @var DateTime|null
 	 */
-	protected $presentedAt;
+	protected $presentedAt = null;
 
 	/**
 	 * Cob expires after x seconds.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var int
+	 * @var int|null
 	 */
-	protected $expiresIn;
+	protected $expiresIn = null;
 
 	/**
 	 * Cob due date.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var DateTime
+	 * @var DateTime|null
 	 */
-	protected $dueDate;
+	protected $dueDate = null;
 
 	/**
 	 * Cob expires after x days.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var int
+	 * @var int|null
 	 */
-	protected $expirationAfter;
-	
+	protected $expirationAfter = null;
+
 	/**
 	 * Get date of creation to current calendar.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @return DateTime
+	 * @since 3.0.0 May return null value.
+	 * @return DateTime|null
 	 */
-	public function getCreatedAt () : DateTime
+	public function getCreatedAt () : ?DateTime
 	{ return $this->createdAt; }
 
 	/**
 	 * Set created at to current calendar.
-	 * 
+	 *
 	 * @param string|DateTime $createdAt
 	 * @since 2.0.0
 	 * @return self
@@ -79,16 +80,17 @@ class Calendar
 
 	/**
 	 * Get date of presentation to current calendar.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @return DateTime
+	 * @since 3.0.0 May return null value.
+	 * @return DateTime|null
 	 */
-	public function getPresentedAt () : DateTime
+	public function getPresentedAt () : ?DateTime
 	{ return $this->presentedAt; }
 
 	/**
 	 * Set presented at to current calendar.
-	 * 
+	 *
 	 * @param string|DateTime $presentedAt
 	 * @since 2.0.0
 	 * @return self
@@ -98,35 +100,37 @@ class Calendar
 
 	/**
 	 * Get time to expires in seconds to current calendar.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @return int
+	 * @since 3.0.0 May return null value.
+	 * @return int|null
 	 */
-	public function getExpiresIn () : int
+	public function getExpiresIn () : ?int
 	{ return $this->expiresIn; }
 
 	/**
 	 * Set time in seconds to expiration of current calendar.
-	 * 
+	 *
 	 * @param int $seconds
 	 * @since 2.0.0
 	 * @return self
 	 */
 	public function setExpiresIn ( int $seconds )
 	{ $this->expiresIn = $seconds; return $this;	}
-	
+
 	/**
 	 * Get due date to current calendar.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @return DateTime
+	 * @since 3.0.0 May return null value.
+	 * @return DateTime|null
 	 */
-	public function getDueDate () : DateTime
+	public function getDueDate () : ?DateTime
 	{ return $this->dueDate; }
 
 	/**
 	 * Set due date to current calendar.
-	 * 
+	 *
 	 * @param string|DateTime $dueDate
 	 * @since 2.0.0
 	 * @return self
@@ -136,16 +140,17 @@ class Calendar
 
 	/**
 	 * Get days after due date to expires to current calendar.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @return int
+	 * @since 3.0.0 May return null value.
+	 * @return int|null
 	 */
-	public function getExpirationAfter () : int
+	public function getExpirationAfter () : ?int
 	{ return $this->expirationAfter; }
 
 	/**
 	 * Set time in days to expiration after due date of current calendar.
-	 * 
+	 *
 	 * @param int $days
 	 * @since 2.0.0
 	 * @return self
@@ -155,20 +160,20 @@ class Calendar
 
 	/**
 	 * Export this object to an array.
-	 * 
+	 *
 	 * @since 2.0.0
 	 * @return array
 	 */
 	public function export () : array
 	{
 		$array = [];
-		
+
 		if ( isset( $this->createdAt ) )
 		{ $array['criacao'] = $this->createdAt->format(DateTime::RFC3339); }
-		
+
 		if ( isset( $this->presentedAt ) )
 		{ $array['apresentacao'] = $this->presentedAt->format(DateTime::RFC3339); }
-		
+
 		if ( isset( $this->expiresIn ) )
 		{ $array['expiracao'] = $this->expiresIn; }
 
@@ -183,7 +188,7 @@ class Calendar
 
 	/**
 	 * Import data to array.
-	 * 
+	 *
 	 * @param string $type Person type
 	 * @param array $data
 	 * @since 2.0.0
@@ -201,7 +206,7 @@ class Calendar
 
 		foreach ( $importable as $field => $method )
 		{
-			if ( isset($data[$field]) )
+			if ( empty($data[$field]) === false )
 			{ $this->{$method}($data[$field]); }
 		}
 

@@ -3,7 +3,7 @@ namespace Piggly\Pix\Api\Payloads\Entities;
 
 /**
  * Amount entity to Cob payload.
- * 
+ *
  * @package \Piggly\Pix
  * @subpackage \Piggly\Pix\Api\Payloads\Entities
  * @version 2.0.0
@@ -18,28 +18,28 @@ class Amount
 {
 	/**
 	 * Original amount.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var float
+	 * @var float|null
 	 */
-	protected $original;
+	protected $original = null;
 
 	/**
 	 * Final amount.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var float
+	 * @var float|null
 	 */
-	protected $final;
+	protected $final = null;
 
 	/**
 	 * Modalities to amount.
-	 * 
+	 *
 	 * @since 2.0.0
 	 * @var array<DueAmountModality>
 	 */
 	protected $modalities = [];
-	
+
 	/**
 	 * Get original amount.
 	 *
@@ -58,7 +58,7 @@ class Amount
 	 */
 	public function setOriginal ( $original )
 	{ $this->original = \is_float($original) ? $original : \floatval($original); return $this; }
-	
+
 	/**
 	 * Get final amount.
 	 *
@@ -102,14 +102,14 @@ class Amount
 	 * Get all modalities associated to pix transaction.
 	 *
 	 * @since 2.0.0
-	 * @return array
+	 * @return array<DueAmountModality>
 	 */
 	public function getModalities () : array
 	{ return $this->modalities; }
 
 	/**
 	 * Export this object to an array.
-	 * 
+	 *
 	 * @since 2.0.0
 	 * @return array
 	 */
@@ -133,7 +133,7 @@ class Amount
 
 	/**
 	 * Import data to array.
-	 * 
+	 *
 	 * @param array $data
 	 * @since 2.0.0
 	 * @return self
@@ -147,16 +147,17 @@ class Amount
 
 		foreach ( $importable as $field => $method )
 		{
-			if ( isset($data[$field]) )
+			if ( empty($data[$field]) === false )
 			{ $this->{$method}($data[$field]); }
 		}
 
 		foreach ( DueAmountModality::MODALITIES as $modality )
 		{
-			if ( isset($data[$modality]) )
+			if ( empty($data[$modality]) === false )
 			{ $this->addModality((new DueAmountModality($modality))->import($data[$modality])); }
 		}
 
+		// @todo add retirada
 		return $this;
 	}
 }

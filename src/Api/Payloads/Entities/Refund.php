@@ -8,7 +8,7 @@ use RuntimeException;
 
 /**
  * Refund entity to Pix entity.
- * 
+ *
  * @package \Piggly\Pix
  * @subpackage \Piggly\Pix\Api\Payloads\Entities
  * @version 2.0.0
@@ -22,24 +22,24 @@ use RuntimeException;
 class Refund
 {
 	/**
-	 * Refund status as "EM_PROCESSAMENTO" . 
-	 * 
+	 * Refund status as "EM_PROCESSAMENTO" .
+	 *
 	 * @var string
 	 * @since 2.0.0
 	 */
 	const STATUS_PROCESSING = 'EM_PROCESSAMENTO';
-	
+
 	/**
-	 * Refund status as "DEVOLVIDO" . 
-	 * 
+	 * Refund status as "DEVOLVIDO" .
+	 *
 	 * @var string
 	 * @since 2.0.0
 	 */
 	const STATUS_CHARGEDBACK = 'DEVOLVIDO';
 
 	/**
-	 * Refund status as "NAO_REALIZADO" . 
-	 * 
+	 * Refund status as "NAO_REALIZADO" .
+	 *
 	 * @var string
 	 * @since 2.0.0
 	 */
@@ -47,7 +47,7 @@ class Refund
 
 	/**
 	 * All refund statuses available.
-	 * 
+	 *
 	 * @var array<string>
 	 * @since 2.0.0
 	 */
@@ -55,6 +55,51 @@ class Refund
 		self::STATUS_PROCESSING,
 		self::STATUS_CHARGEDBACK,
 		self::STATUS_UNREALIZED
+	];
+
+	/**
+	 * Refund nature as "ORIGINAL" .
+	 *
+	 * @var string
+	 * @since 3.0.0
+	 */
+	const NATURE_ORIGINAL = 'ORIGINAL';
+
+	/**
+	 * Refund nature as "RETIRADA" .
+	 *
+	 * @var string
+	 * @since 3.0.0
+	 */
+	const NATURE_RETIRADA = 'RETIRADA';
+
+	/**
+	 * Refund nature as "MED_OPERACIONAL" .
+	 *
+	 * @var string
+	 * @since 3.0.0
+	 */
+	const NATURE_MED_OPERACIONAL = 'MED_OPERACIONAL';
+
+	/**
+	 * Refund nature as "MED_FRAUDE" .
+	 *
+	 * @var string
+	 * @since 3.0.0
+	 */
+	const NATURE_MED_FRAUDE = 'MED_FRAUDE';
+
+	/**
+	 * All refund natures available.
+	 *
+	 * @var array<string>
+	 * @since 3.0.0
+	 */
+	const NATURES = [
+		self::NATURE_ORIGINAL,
+		self::NATURE_RETIRADA,
+		self::NATURE_MED_OPERACIONAL,
+		self::NATURE_MED_FRAUDE
 	];
 
 	/**
@@ -90,28 +135,62 @@ class Refund
 	protected $status;
 
 	/**
+	 * Return nature.
+	 *
+	 * @var string|null
+	 * @since 3.0.0
+	 */
+	protected $nature = null;
+
+	/**
 	 * Return reason.
 	 *
-	 * @var string
+	 * @var string|null
 	 * @since 2.0.0
 	 */
-	protected $reason;
+	protected $reason = null;
+
+	/**
+	 * Return description.
+	 *
+	 * @var string|null
+	 * @since 3.0.0
+	 */
+	protected $description = null;
 
 	/**
 	 * Date when return was requested.
 	 *
-	 * @var DateTime
+	 * @var DateTime|null
 	 * @since 2.0.0
 	 */
-	protected $requestedAt;
+	protected $requestedAt = null;
 
 	/**
 	 * Date when return was paid.
 	 *
-	 * @var DateTime
+	 * @var DateTime|null
 	 * @since 2.0.0
 	 */
-	protected $paidAt;
+	protected $paidAt = null;
+
+	/**
+	 * Create a new Refund entity.
+	 *
+	 * @param string $id
+	 * @param string $rtid
+	 * @param string $status
+	 * @param float|string $amount
+	 * @since 3.0.0
+	 * @return self
+	 */
+	public function __construct ( string $id, string $rtid, string $status, $amount )
+	{
+		$this->setId($id);
+		$this->setRid($rtid);
+		$this->setStatus($status);
+		$this->setAmount($amount);
+	}
 
 	/**
 	 * Get date when return was paid.
@@ -152,6 +231,53 @@ class Refund
 	{ $this->requestedAt = $requestedAt instanceof DateTime ? $requestedAt : new DateTime($requestedAt); return $this; }
 
 	/**
+	 * Get return nature.
+	 *
+	 * @since 3.0.0
+	 * @return string|null
+	 */
+	public function getNature () : ?string
+	{ return $this->nature; }
+
+	/**
+	 * Set return nature.
+	 *
+	 * @param string $natureza Return nature.
+	 * @since 3.0.0
+	 * @return self
+	 * @throws InvalidFieldException
+	 */
+	public function setNature ( string $nature )
+	{
+		try
+		{ static::validateNature($nature); }
+		catch ( Exception $e )
+		{ throw new InvalidFieldException('Devolução.Natureza', $nature, $e->getMessage()); }
+
+		$this->nature = $nature;
+		return $this;
+	}
+
+	/**
+	 * Get return description.
+	 *
+	 * @since 3.0.0
+	 * @return string|null
+	 */
+	public function getDescription () : ?string
+	{ return $this->description; }
+
+	/**
+	 * Set return description.
+	 *
+	 * @param string $description Return description.
+	 * @since 3.0.0
+	 * @return self
+	 */
+	public function setDescription ( string $description )
+	{ $this->description = $description; return $this; }
+
+	/**
 	 * Get return reason.
 	 *
 	 * @since 2.0.0
@@ -188,14 +314,14 @@ class Refund
 	 * @throws InvalidFieldException
 	 */
 	public function setStatus ( string $status )
-	{ 
+	{
 		try
 		{ static::validateStatus($status); }
 		catch ( Exception $e )
 		{ throw new InvalidFieldException('Devolução.Status', $status, $e->getMessage()); }
-		
-		$this->status = $status; 
-		return $this; 
+
+		$this->status = $status;
+		return $this;
 	}
 
 	/**
@@ -257,14 +383,14 @@ class Refund
 
 	/**
 	 * Export this object to an array.
-	 * 
+	 *
 	 * @since 2.0.0
 	 * @return array
 	 */
 	public function export () : array
 	{
 		$array = [];
-		
+
 		if ( !empty($this->id) )
 		{ $array['id'] = $this->id; }
 
@@ -280,9 +406,15 @@ class Refund
 		if ( !empty($this->reason) )
 		{ $array['motivo'] = $this->reason; }
 
+		if ( !empty($this->description) )
+		{ $array['descricao'] = $this->description; }
+
+		if ( !empty($this->nature) )
+		{ $array['natureza'] = $this->nature; }
+
 		if ( !empty($this->requestedAt) || !empty($this->paidAt) )
-		{ 
-			$array['horario'] = []; 
+		{
+			$array['horario'] = [];
 
 			if ( !empty($this->requestedAt) )
 			{ $array['horario']['solicitacao'] = $this->requestedAt->format(DateTime::RFC3339); }
@@ -296,7 +428,7 @@ class Refund
 
 	/**
 	 * Import data to array.
-	 * 
+	 *
 	 * @param array $data
 	 * @since 2.0.0
 	 * @return self
@@ -304,16 +436,14 @@ class Refund
 	public function import ( array $data )
 	{
 		$importable = [
-			'id' => 'setId',
-			'rtrId' => 'setRid',
-			'valor' => 'setAmount',
-			'status' => 'setStatus',
-			'motivo' => 'setReason'
+			'motivo' => 'setReason',
+			'descricao' => 'setDescription',
+			'natureza' => 'setNature'
 		];
 
 		foreach ( $importable as $field => $method )
 		{
-			if ( isset($data[$field]) )
+			if ( empty($data[$field]) === false )
 			{ $this->{$method}($data[$field]); }
 		}
 
@@ -326,7 +456,7 @@ class Refund
 
 			foreach ( $importable as $field => $method )
 			{
-				if ( isset($data['horario'][$field]) )
+				if ( empty($data['horario'][$field]) === false )
 				{ $this->{$method}($data['horario'][$field]); }
 			}
 		}
@@ -358,13 +488,47 @@ class Refund
 	 * @throws RuntimeException If some is a invalid status.
 	 */
 	public static function isStatus ( string $expected, string $actual ) : bool
-	{ 
+	{
 		if ( \in_array($expected, static::STATUSES, true) === false )
 		{ throw new RuntimeException(\sprintf('O status esperado deve ser um dos seguintes: `%s`.', \implode('`, `', static::STATUSES))); }
-		
+
 		if ( \in_array($actual, static::STATUSES, true) === false )
 		{ throw new RuntimeException(\sprintf('O status atual deve ser um dos seguintes: `%s`.', \implode('`, `', static::STATUSES))); }
-		
-		return $expected === $actual; 
+
+		return $expected === $actual;
+	}
+
+	/**
+	 * Throw an exception if $nature is a invalid nature.
+	 *
+	 * @param string $nature
+	 * @since 3.0.0
+	 * @return void
+	 * @throws RuntimeException If is a invalid nature.
+	 */
+	public static function validateNature ( string $nature )
+	{
+		if ( \in_array($nature, static::STATUSES, true) === false )
+		{ throw new RuntimeException(\sprintf('A natureza deve ser uma das seguintes: `%s`.', \implode('`, `', static::NATURES))); }
+	}
+
+	/**
+	 * Is $expected equal to $actual.
+	 *
+	 * @param string $expected
+	 * @param string $actual
+	 * @since 3.0.0
+	 * @return boolean
+	 * @throws RuntimeException If some is a invalid nature.
+	 */
+	public static function isNature ( string $expected, string $actual ) : bool
+	{
+		if ( \in_array($expected, static::STATUSES, true) === false )
+		{ throw new RuntimeException(\sprintf('A natureza esperado deve ser uma das seguintes: `%s`.', \implode('`, `', static::NATURES))); }
+
+		if ( \in_array($actual, static::STATUSES, true) === false )
+		{ throw new RuntimeException(\sprintf('A natureza atual deve ser uma das seguintes: `%s`.', \implode('`, `', static::NATURES))); }
+
+		return $expected === $actual;
 	}
 }
