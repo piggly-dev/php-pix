@@ -33,12 +33,28 @@ class Amount
 	protected $final = null;
 
 	/**
+	 * Capability of change amount in payer.
+	 *
+	 * @since 2.0.0
+	 * @var boolean
+	 */
+	protected $changeability = false;
+
+	/**
 	 * Modalities to amount.
 	 *
 	 * @since 2.0.0
 	 * @var array<DueAmountModality>
 	 */
 	protected $modalities = [];
+
+	/**
+	 * Components associated to Pix.
+	 *
+	 * @var array<PixComponentAmount>
+	 * @since 3.0.0
+	 */
+	protected $withdraws = [];
 
 	/**
 	 * Get original amount.
@@ -108,6 +124,60 @@ class Amount
 	{ return $this->modalities; }
 
 	/**
+	 * Get if payer can change amount.
+	 *
+	 * @since 3.0.0
+	 * @return bool
+	 */
+	public function getChangeability () : bool
+	{ return $this->changeability; }
+
+	/**
+	 * Set if payer can change amount.
+	 *
+	 * @param bool $changeability
+	 * @since 3.0.0
+	 * @return self
+	 */
+	public function payerCanChangeAmount ( bool $changeability )
+	{ $this->changeability = $changeability; return $this; }
+
+
+	/**
+	 * Add component to pix transacion.
+	 *
+	 * @param string $type
+	 * @param PixComponentAmount|array $component
+	 * @since 3.0.0
+	 * @return self
+	 */
+	public function addWithdraw( string $type, $component )
+	{
+		$component = $component instanceof PixComponentAmount ? $component : (new PixComponentAmount($type, $component['valor']))->import($component);
+		$this->withdraws[$type] = $component;
+		return $this;
+	}
+
+	/**
+	 * Get component by type.
+	 *
+	 * @param string $rid
+	 * @since 3.0.0
+	 * @return PixComponentAmount|null
+	 */
+	public function getWithdraw( string $rid ) : ?PixComponentAmount
+	{ return $this->withdraws[$rid] ?? null; }
+
+	/**
+	 * Get all components associated to pix transaction.
+	 *
+	 * @since 3.0.0
+	 * @return array<PixComponentAmount>
+	 */
+	public function getWithdraws() : array
+	{ return $this->withdraws; }
+
+	/**
 	 * Export this object to an array.
 	 *
 	 * @since 2.0.0
@@ -116,7 +186,8 @@ class Amount
 	public function export () : array
 	{
 		$array = [
-			'original' => \number_format($this->original, 2, '.', '')
+			'original' => \number_format($this->original, 2, '.', ''),
+			'modalidadeAlteracao' => $this->changeability ? 1 : 0
 		];
 
 		if ( !empty($this->final) )
@@ -126,6 +197,13 @@ class Amount
 		{
 			foreach ( $this->modalities as $modality )
 			{ $array[$modality->getModality()] = $modality->export(); }
+		}
+
+		if ( !empty($this->withdraws) ) {
+			$array['retirada'] = [];
+
+			foreach ( $this->withdraws as $c )
+			{ $array['retirada'][$c->getType()] = $c->export(); }
 		}
 
 		return $array;
@@ -142,7 +220,7 @@ class Amount
 	{
 		$importable = [
 			'original' => 'setOriginal',
-			'final' => 'setFinal'
+			'final' => 'setFinal',
 		];
 
 		foreach ( $importable as $field => $method )
@@ -151,13 +229,21 @@ class Amount
 			{ $this->{$method}($data[$field]); }
 		}
 
+		if ( isset($data['modalidadeAlteracao']) )
+		{ $this->payerCanChangeAmount(\boolval($data['modalidadeAlteracao'])); }
+
 		foreach ( DueAmountModality::MODALITIES as $modality )
 		{
 			if ( empty($data[$modality]) === false )
 			{ $this->addModality((new DueAmountModality($modality))->import($data[$modality])); }
 		}
 
-		// @todo add retirada
+		if ( empty($data['retirada']) === false && \is_array($data['retirada']) )
+		{
+			foreach ( $data['retirada'] as $type => $componenteValor )
+			{ $this->addWithdraw($type, $componenteValor); }
+		}
+
 		return $this;
 	}
 }

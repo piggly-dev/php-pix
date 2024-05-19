@@ -67,6 +67,14 @@ class PixComponentAmount
 	const TYPE_DISCOUNT = 'desconto';
 
 	/**
+	 * Component type as "troco" .
+	 *
+	 * @var string
+	 * @since 3.0.0
+	 */
+	const TYPE_EXCHANGE = 'troco';
+
+	/**
 	 * All Component type available.
 	 *
 	 * @var array<string>
@@ -78,7 +86,8 @@ class PixComponentAmount
 		self::TYPE_FEES,
 		self::TYPE_FINE,
 		self::TYPE_REBATE,
-		self::TYPE_DISCOUNT
+		self::TYPE_DISCOUNT,
+		self::TYPE_EXCHANGE
 	];
 
 	/**
