@@ -1,66 +1,65 @@
 <?php
 namespace Piggly\Tests\Pix;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Piggly\Pix\Emv\MPM;
 use Piggly\Pix\Parser;
 use Piggly\Pix\StaticPayload;
 
-/**
- * @coversDefaultClass \Piggly\Pix\StaticPayload
- */
+#[CoversClass(StaticPayload::class)]
 class ValidStaticPixTest extends TestCase
 {
 	/**
 	 * Assert if $payload code is same as $expected.
-	 * 
+	 *
 	 * It will ignore case and ignore the CRC16.
-	 * 
+	 *
 	 * Some bank may lower or upper case data, remove
 	 * or add fields automatic. It will return different
 	 * CRC16 for "same" data. That's why it will ignore
 	 * it and uppercase both codes.
 	 *
 	 * @covers ::getPixCode
-	 * @dataProvider dataPixes
-	 * @test Expecting positive assertion.
 	 * @param string $expected Expected result.
 	 * @param StaticPayload $payload Payload to pix.
 	 * @return boolean
 	 */
+	#[Test, DataProvider('dataPixes')]
 	public function isPixValid ( string $expected, StaticPayload $payload )
-	{ 
+	{
 		$expected = \substr(\strtoupper($expected), 0, \strlen($expected)-8);
 		$actual = \substr(\strtoupper($payload->getPixCode()), 0, \strlen($payload->getPixCode())-8);
-		$this->assertEquals($expected, $actual); 
+		$this->assertEquals($expected, $actual);
 	}
-	
+
 	/**
 	 * Assert if $expected matches to $actual CRC16.
 	 *
 	 * @covers MPM::CRC16
-	 * @dataProvider dataCRC
-	 * @test Expecting positive assertion.
 	 * @param string $actual String to generate.
 	 * @return boolean
 	 */
+	#[Test, DataProvider('dataCRC')]
 	public function isCRCValid ( string $actual )
-	{ 
+	{
 		$expected = \substr($actual, -4);
 		$actual   = \str_replace($expected, '', $actual);
-		$this->assertEquals($expected, MPM::CRC16($actual)); 
+		$this->assertEquals($expected, MPM::CRC16($actual));
 	}
 
 	/**
 	 * A list with valid pix created.
 	 * Provider to isPixValid() method.
-	 * 
+	 *
 	 * Please, add here only pix code generated
 	 * by bank applications.
-	 * 
+	 *
 	 * @return array
 	 */
-	public function dataPixes () : array
+	public static function dataPixes () : array
 	{
 		$pix = [];
 
@@ -119,13 +118,13 @@ class ValidStaticPixTest extends TestCase
 	/**
 	 * A list with valid pix created to validate CRC.
 	 * Provider to isCRCValid() method.
-	 * 
+	 *
 	 * Please, add here only pix code generated
 	 * by bank applications.
-	 * 
+	 *
 	 * @return array
 	 */
-	public function dataCRC () : array
+	public static function dataCRC () : array
 	{
 		$pix = [];
 

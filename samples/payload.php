@@ -11,17 +11,17 @@ try
 	// Pix estático
 	// Obtém os dados pix do usuário
 	// -> Dados obrigatórios
-	$keyType  = filter_input( INPUT_POST, 'keyType', FILTER_SANITIZE_STRING);
-	$keyValue = filter_input( INPUT_POST, 'keyValue', FILTER_SANITIZE_STRING);
-	$merchantName = filter_input( INPUT_POST, 'merchantName', FILTER_SANITIZE_STRING);
-	$merchantCity = filter_input( INPUT_POST, 'merchantCity', FILTER_SANITIZE_STRING);
+	$keyType  = htmlspecialchars( filter_input( INPUT_POST, 'keyType' ) );
+	$keyValue = htmlspecialchars( filter_input( INPUT_POST, 'keyValue' ) );
+	$merchantName = htmlspecialchars( filter_input( INPUT_POST, 'merchantName' ) );
+	$merchantCity = htmlspecialchars( filter_input( INPUT_POST, 'merchantCity' ) );
 
 	// -> Dados opcionais
-	$amount = filter_input( INPUT_POST, 'amount', FILTER_SANITIZE_STRING);
-	$tid = filter_input( INPUT_POST, 'tid', FILTER_SANITIZE_STRING);
-	$description = filter_input( INPUT_POST, 'description', FILTER_SANITIZE_STRING);
+	$amount = htmlspecialchars( filter_input( INPUT_POST, 'amount' ) );
+	$tid = htmlspecialchars( filter_input( INPUT_POST, 'tid' ) );
+	$description = htmlspecialchars( filter_input( INPUT_POST, 'description' ) );
 
-	$payload = 
+	$payload =
 		(new StaticPayload())
 			->setAmount($amount)
 			->setTid($tid)
@@ -33,16 +33,16 @@ try
 	// Pix dinâmico
 	// Obtém os dados pix do usuário
 	// -> Dados obrigatórios
-	$merchantName = filter_input( INPUT_POST, 'merchantName', FILTER_SANITIZE_STRING);
-	$merchantCity = filter_input( INPUT_POST, 'merchantCity', FILTER_SANITIZE_STRING);
+	$merchantName = htmlspecialchars( filter_input( INPUT_POST, 'merchantName' ) );
+	$merchantCity = htmlspecialchars( filter_input( INPUT_POST, 'merchantCity' ) );
 
 	// Obtém os dados do SPI para o Pix
-	$payload = 
+	$payload =
 	(new DynamicPayload())
 		->setUrl($spiUrl) // URL do Pix no SPI
 		->setMerchantName($merchantName)
 		->setMerchantCity($merchantCity);
-		
+
 	// Continue o código
 
 	// Código pix

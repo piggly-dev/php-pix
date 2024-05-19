@@ -2,10 +2,11 @@
 namespace Piggly\Pix\Api\Payloads\Entities;
 
 use DateTime;
+use Piggly\Pix\Utils\Helper;
 
 /**
  * Pix entity to Cob payload.
- * 
+ *
  * @package \Piggly\Pix
  * @subpackage \Piggly\Pix\Api\Payloads\Entities
  * @version 2.0.0
@@ -25,15 +26,7 @@ class Pix
 	 * @since 2.0.0
 	 */
 	protected $e2eid;
-	
-	/**
-	 * Transaction id.
-	 *
-	 * @var string
-	 * @since 2.0.0
-	 */
-	protected $tid;
-	
+
 	/**
 	 * Pix amount.
 	 *
@@ -41,7 +34,15 @@ class Pix
 	 * @since 2.0.0
 	 */
 	protected $amount;
-	
+
+	/**
+	 * Transaction id.
+	 *
+	 * @var string|null
+	 * @since 2.0.0
+	 */
+	protected $tid;
+
 	/**
 	 * Pix processed date.
 	 *
@@ -59,6 +60,15 @@ class Pix
 	protected $info;
 
 	/**
+	 * Components associated
+	 * to Pix.
+	 *
+	 * @var array<PixComponentAmount>
+	 * @since 3.0.0
+	 */
+	protected $components = [];
+
+	/**
 	 * Refunds associated
 	 * to Pix.
 	 *
@@ -66,6 +76,20 @@ class Pix
 	 * @since 2.0.0
 	 */
 	protected $refunds = [];
+
+	/**
+	 * Create a new Pix entity.
+	 *
+	 * @param string $e2eid
+	 * @param float|string $amount
+	 * @since 3.0.0
+	 * @return self
+	 */
+	public function __construct ( string $e2eid, $amount )
+	{
+		$this->setE2eid($e2eid);
+		$this->setAmount($amount);
+	}
 
 	/**
 	 * Get extra information.
@@ -90,9 +114,9 @@ class Pix
 	 * Get pix processed date.
 	 *
 	 * @since 2.0.0
-	 * @return DateTime
+	 * @return DateTime|null
 	 */
-	public function getProcessedAt () : DateTime
+	public function getProcessedAt () : ?DateTime
 	{ return $this->processedAt; }
 
 	/**
@@ -128,7 +152,7 @@ class Pix
 	 * Get transaction id.
 	 *
 	 * @since 2.0.0
-	 * @return string
+	 * @return string|null
 	 */
 	public function getTid () : ?string
 	{ return $this->tid; }
@@ -170,9 +194,9 @@ class Pix
 	 * @return self
 	 */
 	public function addRefund ( $refund )
-	{ 
-		$refund = $refund instanceof Refund ? $refund : (new Refund())->import($refund);
-		$this->refunds[$refund->getRid()] = $refund; 
+	{
+		$refund = $refund instanceof Refund ? $refund : (new Refund($refund['id'], $refund['rtrId'], $refund['status'], $refund['valor']))->import($refund);
+		$this->refunds[$refund->getRid()] = $refund;
 		return $this;
 	}
 
@@ -190,14 +214,48 @@ class Pix
 	 * Get all refunds associated to pix transaction.
 	 *
 	 * @since 2.0.0
-	 * @return array
+	 * @return array<Refund>
 	 */
 	public function getRefunds () : array
 	{ return $this->refunds; }
 
 	/**
+	 * Add component to pix transacion.
+	 *
+	 * @param string $type
+	 * @param PixComponentAmount|array $component
+	 * @since 3.0.0
+	 * @return self
+	 */
+	public function addComponent ( string $type, $component )
+	{
+		$component = $component instanceof PixComponentAmount ? $component : (new PixComponentAmount($type, $component['valor']))->import($component);
+		$this->components[$type] = $component;
+		return $this;
+	}
+
+	/**
+	 * Get component by type.
+	 *
+	 * @param string $rid
+	 * @since 3.0.0
+	 * @return PixComponentAmount|null
+	 */
+	public function getComponent ( string $rid ) : ?PixComponentAmount
+	{ return $this->components[$rid] ?? null; }
+
+	/**
+	 * Get all components associated to pix transaction.
+	 *
+	 * @since 3.0.0
+	 * @return array<PixComponentAmount>
+	 */
+	public function getComponents () : array
+	{ return $this->components; }
+
+	/**
 	 * Export this object to an array.
-	 * 
+	 *
 	 * @since 2.0.0
 	 * @return array
 	 */
@@ -221,11 +279,18 @@ class Pix
 		{ $array['infoPagador'] = $this->info; }
 
 		if ( !empty($this->refunds) )
-		{ 
+		{
 			$array['devolucoes'] = [];
 
 			foreach ( $this->refunds as $r )
 			{ $array['devolucoes'][] = $r->export(); }
+		}
+
+		if ( !empty($this->components) ) {
+			$array['componentesValor'] = [];
+
+			foreach ( $this->components as $c )
+			{ $array['componentesValor'][$c->getType()] = $c->export(); }
 		}
 
 		return $array;
@@ -233,33 +298,44 @@ class Pix
 
 	/**
 	 * Import data to array.
-	 * 
+	 *
 	 * @param array $data
 	 * @since 2.0.0
 	 * @return self
 	 */
 	public function import ( array $data )
 	{
-		$importable = [
-			'endToEndId' => 'setE2eid',
+		Helper::fill($data, $this, [
 			'txid' => 'setTid',
-			'valor' => 'setAmount',
 			'horario' => 'setProcessedAt',
 			'infoPagador' => 'setInfo'
-		];
+		]);
 
-		foreach ( $importable as $field => $method )
-		{
-			if ( isset($data[$field]) )
-			{ $this->{$method}($data[$field]); }
-		}
-
-		if ( isset($data['devolucoes']) )
+		if ( empty($data['devolucoes']) === false && \is_array($data['devolucoes']) )
 		{
 			foreach ( $data['devolucoes'] as $devolucao )
 			{ $this->addRefund($devolucao); }
 		}
 
+		if ( empty($data['componentesValor']) === false && \is_array($data['componentesValor']) )
+		{
+			foreach ( $data['componentesValor'] as $type => $componenteValor )
+			{ $this->addComponent($type, $componenteValor); }
+		}
+
 		return $this;
+	}
+
+	/**
+	 * Create a new entity.
+	 *
+	 * @param array $data
+	 * @since 3.0.0
+	 * @return Pix
+	 */
+	public static function create ( array $data )
+	{
+		$e = new Pix($data['endToEndId'], $data['valor']);
+		return $e->import($data);
 	}
 }

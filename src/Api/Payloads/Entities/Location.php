@@ -5,10 +5,11 @@ use DateTime;
 use Exception;
 use Piggly\Pix\Api\Payloads\Cob;
 use Piggly\Pix\Exceptions\InvalidFieldException;
+use Piggly\Pix\Utils\Helper;
 
 /**
  * Location entity to Cob payload.
- * 
+ *
  * @package \Piggly\Pix
  * @subpackage \Piggly\Pix\Api\Payloads\Entities
  * @version 2.0.0
@@ -23,51 +24,51 @@ class Location
 {
 	/**
 	 * Location id.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var int
+	 * @var int|null
 	 */
-	protected $id;
+	protected $id = null;
 
 	/**
 	 * Location transaction id.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var string
+	 * @var string|null
 	 */
-	protected $tid;
+	protected $tid = null;
 
 	/**
 	 * Location url.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var string
+	 * @var string|null
 	 */
-	protected $location;
+	protected $location = null;
 
 	/**
 	 * Location type.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var string
+	 * @var string|null
 	 */
-	protected $type;
+	protected $type = null;
 
 	/**
 	 * Date when location was created.
-	 * 
+	 *
 	 * @since 2.0.0
-	 * @var DateTime
+	 * @var DateTime|null
 	 */
-	protected $createdAt;
+	protected $createdAt = null;
 
 	/**
 	 * Get date when location was created.
 	 *
 	 * @since 2.0.0
-	 * @return DateTime
+	 * @return DateTime|null
 	 */
-	public function getCreatedAt () : DateTime
+	public function getCreatedAt () : ?DateTime
 	{ return $this->createdAt; }
 
 	/**
@@ -84,9 +85,9 @@ class Location
 	 * Get location type.
 	 *
 	 * @since 2.0.0
-	 * @return string
+	 * @return string|null
 	 */
-	public function getType () : string
+	public function getType () : ?string
 	{ return $this->type; }
 
 	/**
@@ -97,23 +98,23 @@ class Location
 	 * @return self
 	 */
 	public function setType ( string $type )
-	{ 
+	{
 		try
 		{ Cob::validateType($type); }
 		catch ( Exception $e )
 		{ throw new InvalidFieldException('Location.TipoCob', $type, $e->getMessage()); }
 
-		$this->type = $type; 
-		return $this; 
+		$this->type = $type;
+		return $this;
 	}
 
 	/**
 	 * Get location url.
 	 *
 	 * @since 2.0.0
-	 * @return string
+	 * @return string|null
 	 */
-	public function getLocation () : string
+	public function getLocation () : ?string
 	{ return $this->location; }
 
 	/**
@@ -130,7 +131,7 @@ class Location
 	 * Get location transaction id.
 	 *
 	 * @since 2.0.0
-	 * @return string
+	 * @return string|null
 	 */
 	public function getTid () : ?string
 	{ return $this->tid; }
@@ -149,9 +150,9 @@ class Location
 	 * Get location id.
 	 *
 	 * @since 2.0.0
-	 * @return int
+	 * @return int|null
 	 */
-	public function getId () : int
+	public function getId () : ?int
 	{ return $this->id; }
 
 	/**
@@ -166,14 +167,14 @@ class Location
 
 	/**
 	 * Export this object to an array.
-	 * 
+	 *
 	 * @since 2.0.0
 	 * @return array
 	 */
 	public function export () : array
 	{
 		$array = [];
-		
+
 		if ( !\is_null($this->id) )
 		{ $array['id'] = $this->id; }
 
@@ -194,27 +195,35 @@ class Location
 
 	/**
 	 * Import data to array.
-	 * 
+	 *
 	 * @param array $data
 	 * @since 2.0.0
 	 * @return self
 	 */
 	public function import ( array $data )
 	{
-		$importable = [
+		Helper::fill($data, $this, [
 			'id' => 'setId',
 			'txid' => 'setTid',
 			'location' => 'setLocation',
 			'tipoCob' => 'setType',
 			'criacao' => 'setCreatedAt'
-		];
-
-		foreach ( $importable as $field => $method )
-		{
-			if ( isset($data[$field]) )
-			{ $this->{$method}($data[$field]); }
-		}
+		]);
 
 		return $this;
+	}
+
+	/**
+	 * Create a new entity.
+	 *
+	 * @param string $modality
+	 * @param array $data
+	 * @since 3.0.0
+	 * @return Location
+	 */
+	public static function create ( array $data )
+	{
+		$e = new Location();
+		return $e->import($data);
 	}
 }

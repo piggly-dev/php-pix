@@ -4,11 +4,12 @@ namespace Piggly\Pix\Api\Payloads\Entities;
 use Exception;
 use Piggly\Pix\Api\Payloads\Concerns\UseExtra;
 use Piggly\Pix\Exceptions\InvalidFieldException;
+use Piggly\Pix\Utils\Helper;
 use RuntimeException;
 
 /**
  * Due amount modality entity to Cob payload.
- * 
+ *
  * @package \Piggly\Pix
  * @subpackage \Piggly\Pix\Api\Payloads\Entities
  * @version 2.0.0
@@ -25,39 +26,39 @@ class DueAmountModality
 
 	/**
 	 * Reduction modality.
-	 * 
-	 * @var string 
+	 *
+	 * @var string
 	 * @since 2.0.0
 	 */
 	const MODALITY_REDUCTION = 'abatimento';
 
 	/**
 	 * Fee modality.
-	 * 
-	 * @var string 
+	 *
+	 * @var string
 	 * @since 2.0.0
 	 */
 	const MODALITY_FEE = 'juros';
 
 	/**
 	 * Discount modality.
-	 * 
-	 * @var string 
+	 *
+	 * @var string
 	 * @since 2.0.0
 	 */
 	const MODALITY_DISCOUNT = 'desconto';
 
 	/**
 	 * Bank fine modality.
-	 * 
-	 * @var string 
+	 *
+	 * @var string
 	 * @since 2.0.0
 	 */
 	const MODALITY_BANKFINE = 'multa';
 
 	/**
 	 * All modalities available.
-	 * 
+	 *
 	 * @var array
 	 * @since 2.0.0
 	 */
@@ -70,23 +71,23 @@ class DueAmountModality
 
 	/**
 	 * Reduction modality as fixed.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const REDUCTION_MODALITY_FIXED = 1;
 
 	/**
 	 * Reduction modality as percentage.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const REDUCTION_MODALITY_PERCENTAGE = 2;
 
 	/**
 	 * All reduction modalities available.
-	 * 
+	 *
 	 * @var array
 	 * @since 2.0.0
 	 */
@@ -94,71 +95,71 @@ class DueAmountModality
 
 	/**
 	 * Fee modality as fixed by day.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const FEE_MODALITY_FIXED_REGULAR_CALENDAR = 1;
 
 	/**
 	 * Fee modality as fixed by business day.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const FEE_MODALITY_FIXED_BUSINESS_CALENDAR = 5;
 
 	/**
 	 * Fee modality as percentage by day at regular calendar.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const FEE_MODALITY_PERCENTAGE_BY_DAY_REGULAR_CALENDAR = 2;
 
 	/**
 	 * Fee modality as percentage by mount at regular calendar.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const FEE_MODALITY_PERCENTAGE_BY_MONTH_REGULAR_CALENDAR = 3;
 
 	/**
 	 * Fee modality as percentage by year at regular calendar.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const FEE_MODALITY_PERCENTAGE_BY_YEAR_REGULAR_CALENDAR = 4;
 
 	/**
 	 * Fee modality as percentage by day at business calendar.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const FEE_MODALITY_PERCENTAGE_BY_DAY_BUSINESS_CALENDAR = 6;
 
 	/**
 	 * Fee modality as percentage by mount at business calendar.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const FEE_MODALITY_PERCENTAGE_BY_MONTH_BUSINESS_CALENDAR = 7;
 
 	/**
 	 * Fee modality as percentage by year at business calendar.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const FEE_MODALITY_PERCENTAGE_BY_YEAR_BUSINESS_CALENDAR = 8;
 
 	/**
 	 * All fee modalities available.
-	 * 
+	 *
 	 * @var array
 	 * @since 2.0.0
 	 */
@@ -166,55 +167,55 @@ class DueAmountModality
 
 	/**
 	 * Discount modality as fixed.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const DISCOUNT_MODALITY_FIXED = 1;
 
 	/**
 	 * Discount modality as fixed by day.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const DISCOUNT_MODALITY_FIXED_REGULAR_CALENDAR = 3;
 
 	/**
 	 * Discount modality as fixed by business day.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const DISCOUNT_MODALITY_FIXED_BUSINESS_CALENDAR = 4;
 
 	/**
 	 * Discount modality as percentage.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const DISCOUNT_MODALITY_PERCENTAGE = 2;
 
 	/**
 	 * Discount modality as percentage by day.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const DISCOUNT_MODALITY_PERCENTAGE_REGULAR_CALENDAR = 5;
 
 	/**
 	 * Discount modality as percentage by business day.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const DISCOUNT_MODALITY_PERCENTAGE_BUSINESS_CALENDAR = 6;
 
 	/**
 	 * All discount modalities available.
-	 * 
+	 *
 	 * @var array
 	 * @since 2.0.0
 	 */
@@ -222,23 +223,23 @@ class DueAmountModality
 
 	/**
 	 * Bank fine modality as fixed.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const BANKFINE_MODALITY_FIXED = 1;
 
 	/**
 	 * Bank fine modality as percentage.
-	 * 
-	 * @var integer 
+	 *
+	 * @var integer
 	 * @since 2.0.0
 	 */
 	const BANKFINE_MODALITY_PERCENTAGE = 2;
 
 	/**
 	 * All bank fine modalities available.
-	 * 
+	 *
 	 * @var array
 	 * @since 2.0.0
 	 */
@@ -270,8 +271,8 @@ class DueAmountModality
 
 	/**
 	 * Create an amount modality.
-	 * 
-	 * @param string $modality 
+	 *
+	 * @param string $modality
 	 * @since 2.0.0
 	 * @return self
 	 * @throws InvalidFieldException
@@ -313,15 +314,15 @@ class DueAmountModality
 	 * @return self
 	 * @throws InvalidFieldException
 	 */
-	public function setId ( int $mid ) 
-	{ 
+	public function setId ( int $mid )
+	{
 		try
 		{ static::validateId($this->modality, $mid); }
 		catch ( Exception $e )
 		{ throw new InvalidFieldException('Modalidade.Id', $mid, $e->getMessage()); }
 
-		$this->mid = $mid; 
-		return $this; 
+		$this->mid = $mid;
+		return $this;
 	}
 
 	/**
@@ -345,7 +346,7 @@ class DueAmountModality
 
 	/**
 	 * Export this object to an array.
-	 * 
+	 *
 	 * @since 2.0.0
 	 * @return array
 	 */
@@ -363,32 +364,37 @@ class DueAmountModality
 
 	/**
 	 * Import data to array.
-	 * 
+	 *
 	 * @param array $data
 	 * @since 2.0.0
 	 * @return self
 	 */
 	public function import ( array $data )
 	{
-		$importable = [
+		$rest = Helper::fill($data, $this, [
 			'modalidade' => 'setId',
 			'valorPerc' => 'setAmount'
-		];
-
-		foreach ( $importable as $field => $method )
-		{
-			if ( isset($data[$field]) )
-			{ 
-				$this->{$method}($data[$field]); 
-				unset($data[$field]);
-			}
-		}
+		]);
 
 		// Import extra fields
-		foreach ( $data as $field => $value )
+		foreach ( $rest as $field => $value )
 		{ $this->addExtra($field, $value); }
 
 		return $this;
+	}
+
+	/**
+	 * Create a new entity.
+	 *
+	 * @param string $modality
+	 * @param array $data
+	 * @since 3.0.0
+	 * @return DueAmountModality
+	 */
+	public static function create ( string $modality, array $data )
+	{
+		$e = new DueAmountModality($modality);
+		return $e->import($data);
 	}
 
 	/**
@@ -448,13 +454,13 @@ class DueAmountModality
 	 * @throws RuntimeException If some is a invalid modality.
 	 */
 	public static function is ( string $expected, string $actual ) : bool
-	{ 
+	{
 		if ( \in_array($expected, static::MODALITIES, true) === false )
 		{ throw new RuntimeException(\sprintf('O tipo de modalidade esperado deve ser um dos seguintes: `%s`.', \implode('`, `', static::MODALITIES))); }
-		
+
 		if ( \in_array($actual, static::MODALITIES, true) === false )
 		{ throw new RuntimeException(\sprintf('O tipo de modalidade atual deve ser um dos seguintes: `%s`.', \implode('`, `', static::MODALITIES))); }
-		
-		return $expected === $actual; 
+
+		return $expected === $actual;
 	}
 }
