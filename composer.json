@@ -1,44 +1,42 @@
 {
-    "name": "piggly/php-pix",
-    "description": "Uma biblioteca para preparar e gerar o código Pix do Banco Central do Brasil.",
-    "keywords": [
-        "piggly",
-        "pix",
-        "bcb",
-        "emv", 
-        "qrcode",
-        "payment"
-    ],
-    "type": "library",
-    "homepage": "https://github.com/piggly-dev/php-pix",
-    "autoload": {
-        "psr-4": {
-            "Piggly\\Pix\\": "src"
-        }
-    },
-    "suggest": {
-        "piggly/php-api-client": "Recomentado para criar requisições HTTP seguras e dinâmicas para as API Pix junto com os Payloads padrões."
-    },
-    "require": {
-        "php": "^7.2 || ^8.0",
-        "ext-gd": "*",
-        "chillerlan/php-qrcode": "^3.3"
-    },
-    "require-dev": {
-        "php": "^7.3 || ^8.0",
-        "phpunit/phpunit": "^9.5",
-        "fakerphp/faker": "^1.14"
-    },
-    "scripts": {
-        "test": "phpunit"
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Caique Araujo",
-            "email": "caique@studiopiggly.com.br",
-            "homepage": "https://github.com/caiquearaujo",
-            "role": "Developer"
-        }
-    ]
+	"name": "piggly/php-pix",
+	"description": "Uma biblioteca para preparar e gerar o código Pix do Banco Central do Brasil.",
+	"keywords": [
+		"piggly",
+		"pix",
+		"bcb",
+		"emv",
+		"qrcode",
+		"payment"
+	],
+	"type": "library",
+	"homepage": "https://github.com/piggly-dev/php-pix",
+	"autoload": {
+		"psr-4": {
+			"Piggly\\Pix\\": "src"
+		}
+	},
+	"require": {
+		"php": "^8.0",
+		"ext-gd": "*",
+		"ext-mbstring": "*",
+		"chillerlan/php-qrcode": "^5.0"
+	},
+	"require-dev": {
+		"php": "^8.0",
+		"phpunit/phpunit": "^11.1",
+		"fakerphp/faker": "^1.23"
+	},
+	"scripts": {
+		"test": "phpunit"
+	},
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Caique Araujo",
+			"email": "caique@studiopiggly.com.br",
+			"homepage": "https://github.com/caiquearaujo",
+			"role": "Developer"
+		}
+	]
 }

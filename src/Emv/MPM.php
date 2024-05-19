@@ -3,7 +3,7 @@ namespace Piggly\Pix\Emv;
 
 /**
  * Payload to EMV MPM Format.
- * 
+ *
  * @see https://www.emvco.com/wp-content/plugins/pmpro-customizations/oy-getfile.php?u=/wp-content/uploads/documents/EMVCo-Merchant-Presented-QR-Specification-v1.1.pdf
  * @package \Piggly\Pix
  * @subpackage \Piggly\Pix\Emv
@@ -20,7 +20,7 @@ class MPM
 	/**
 	 * All emvs fields.
 	 *
-	 * @var array<AbstractField>
+	 * @var array<Field|MultiField>
 	 * @since 2.0.0
 	 */
 	protected $emvs;
@@ -32,10 +32,10 @@ class MPM
 	 * @since 2.0.0
 	 */
 	protected $code;
-	
+
 	/**
 	 * All default EMVS.
-	 * 
+	 *
 	 * @since 2.0.0
 	 * @return void
 	 */
@@ -57,7 +57,7 @@ class MPM
 
 		$this->emvs['26']
 			->addField(new Field('00', 'Globally Unique Identifier', 32, true, 'br.gov.bcb.pix'))
-			->addField(new Field('01', 'Pix Key', 36, false))
+			->addField(new Field('01', 'Pix Key', 77, false))
 			->addField(new Field('02', 'Payment Description', 40, false))
 			->addField(new Field('25', 'Payment URL', 77, false));
 
@@ -130,21 +130,21 @@ class MPM
 	 * @return string
 	 */
 	public static function CRC16 ( string $payload ) : string
-	{ 
+	{
 		// Standard values by BACEN
 		$polynomial = 0x1021;
 		$response   = 0xFFFF;
 
 		// Checksum
-		if ( ( $length = \strlen($payload) ) > 0 ) 
+		if ( ( $length = \strlen($payload) ) > 0 )
 		{
-			for ( $offset = 0; $offset < $length; $offset++ ) 
+			for ( $offset = 0; $offset < $length; $offset++ )
 			{
 				$response ^= ( \ord( $payload[$offset] ) << 8 );
-				
-				for ( $bitwise = 0; $bitwise < 8; $bitwise++ ) 
+
+				for ( $bitwise = 0; $bitwise < 8; $bitwise++ )
 				{
-					if ( ( $response <<= 1 ) & 0x10000 ) 
+					if ( ( $response <<= 1 ) & 0x10000 )
 					{ $response ^= $polynomial; }
 
 					$response &= 0xFFFF;
