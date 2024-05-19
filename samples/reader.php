@@ -7,7 +7,7 @@ use Piggly\Pix\Reader;
 use Piggly\Pix\StaticPayload;
 
 // Obtém o código pix informado pelo usuário
-$pixCode = filter_input( INPUT_POST, 'pixCode', FILTER_SANITIZE_STRING );
+$pixCode = htmlspecialchars(filter_input( INPUT_POST, 'pixCode' ));
 
 try
 {
@@ -25,7 +25,7 @@ try
 	$payload = $reader->export();
 
 	/** @var StaticPayload Payload Pix manual */
-	$payload = 
+	$payload =
 	(new StaticPayload())
 		// ->applyValidCharacters()
 		// ->applyUppercase()
@@ -38,7 +38,7 @@ try
 		->setMerchantCity($merchantCity);
 
 	// Continue o código
-	
+
 	// Código pix
 	echo $pix->getPixCode();
 	// QR Code

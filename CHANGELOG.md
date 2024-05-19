@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.0 - `2024-05-19`
+
+* Não é mais compatível com PHP 7.x;
+* Campos obrigatórios passaram para os construtores dos `Payloads`;
+* Novos campos foram adicionados aos `Payloads` e `EMVs`;
+* Demais métodos são compatíveis com a versão 2.
+
 ## 2.0.2 - `2022-06-21`
 
 * O valor do Pix não é mais obrigatório no `StaticPayload`.

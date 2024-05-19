@@ -2,7 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/piggly/php-pix.svg?style=flat-square)](https://packagist.org/packages/piggly/php-pix) [![Packagist Downloads](https://img.shields.io/packagist/dt/piggly/php-pix?style=flat-square)](https://packagist.org/packages/piggly/php-pix) [![Packagist Stars](https://img.shields.io/packagist/stars/piggly/php-pix?style=flat-square)](https://packagist.org/packages/piggly/php-pix) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE) ![PHP](https://img.shields.io/packagist/php-v/piggly/php-pix?style=flat-square)
 
-![Versão Atual](https://img.shields.io/badge/version-2.x.x-green?style=flat-square) 
+![Versão Atual](https://img.shields.io/badge/version-3.x.x-green?style=flat-square)
 
 O **Pix** é o mais novo método de pagamento eletrônico criado pelo **Banco Central do Brasil**. Você encontra todos os detalhes na [página oficial](https://www.bcb.gov.br/estabilidadefinanceira/pix) do Pix. Saiba mais como ele funciona e como nossa biblioteca trabalha [clicando aqui](https://github.com/piggly-dev/php-pix/wiki/04.-Pix).
 
@@ -19,34 +19,16 @@ Leia sobre a solução de problemas [clicando aqui](https://github.com/piggly-de
 
 > Se você apreciar a função desta biblioteca e quiser apoiar este trabalho, sinta-se livre para fazer qualquer doação para a chave aleatória Pix `aae2196f-5f93-46e4-89e6-73bf4138427b` ❤.
 
-## Atualização para a versão 2.0.0
+## Atualização para a versão 3.0.0
 
-Muitas coisas mudaram, além do suporte ao **PHP 8** os campos EMV foram otimizados e expandidos. Além disso, as requisições para APIs foram removidas e os payloads para as APIs foram reformulados. Recomendamos ler a documentação de mudanças [clicando aqui](https://github.com/piggly-dev/php-pix/wiki/11.-Migrar-para-a-vers%C3%A3o-2.x.x) e verificar as diferenças.
+A versão 3 é compatível com os métodos já utilizados na versão 2. Esteja atento as diferenças antes de atualizar:
 
-A biblioteca `chillerlan/php-qrcode` não pode ser atualizada em `composer.json`, tornando necessário utilizar a `flag` `--ignore-platform-reqs` no **PHP 8**. Veja abaixo:
+* Não é mais compatível com PHP 7.x;
+* Campos obrigatórios passaram para os construtores dos `Payloads`;
+* Novos campos foram adicionados aos `Payloads` e `EMVs`;
+* Demais métodos são compatíveis com a versão 2.
 
-```bash
-# composer install
-composer --ignore-platform-req=php install
-
-# composer update
-composer --ignore-platform-req=php update
-
-# e todos os demais comandos do composer
-```
-
-> Muitos utilizadores dessa biblioteca ainda utilizando a versão `7.2` do PHP e não é o momento ideal para perder esse suporte. A partir da versão `2.1.x` pretendemores remover esse suporte.
-
-Para realizar as requisições da api, recomendamos a biblioteca [piggly/php-api-client](https://github.com/piggly-dev/php-api-client), ela foi desenvolvida para ser flexível e muito mais robusta que a solução anterior utilizada na versão 1.x.x.
-
-Veja as principais mudanças da versão 2.x.x:
-
-* O padrão EMV MPM foi atualizado e remodelado para suportar novos campos que podem ser utilizados nos Pix;
-* A validação e verificação das chaves Pix foi aprimorada;
-* A leitura de um código Pix resulta em um objeto de EMVs mais flexível;
-* Os modificadores do payload foram removidos, sendo que agora, todos os dados preenchidos são automaticamente tratados e cortados respeitando completamente o padrão EMV;
-* A classe `BaseAPI` foi removida, adotando como sugestão a biblioteca [piggly/php-api-client](https://github.com/piggly-dev/php-api-client) que traz muito mais flexibilidade e segurança;
-* Os payloads para APIs foram remodelados para serem mais eficientes e flexíveis.
+Para realizar as requisições da api, recomendamos a biblioteca [piggly/php-api-client](https://github.com/piggly-dev/php-api-client), ela foi desenvolvida para ser flexível e muito mais robusta que a solução anterior utilizada na versão 1.x.x. Mas você está livre para utilizar as libs que desejar.
 
 ## Instalação
 
@@ -66,7 +48,8 @@ Veja as principais mudanças da versão 2.x.x:
 Essa bibliotecca possuí as seguintes dependências:
 
 * [Extensão GD do PHP](https://www.php.net/manual/pt_BR/book.image.php) para gerar QR Codes;
-* PHP +7.2 ou PHP +8.0.
+* [Extensão MBString do PHP](https://www.php.net/manual/pt_BR/mbstring.installation.php) para manipulação de strings;
+* PHP +8.0.
 
 ## Como utilizar?
 
